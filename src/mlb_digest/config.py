@@ -69,7 +69,10 @@ def load_config(config_path: Path = DEFAULT_CONFIG_PATH) -> Config:
         team_name=team["name"],
         league_id=team["league_id"],
         team_colors=dict(team.get("colors", {})),
-        email_recipients=_parse_recipients(os.environ.get("EMAIL_RECIPIENTS", ""), email.get("recipients", [])),
+        email_recipients=_parse_recipients(
+            os.environ.get("EMAIL_RECIPIENTS", ""),
+            email.get("recipients", []),
+        ),
         email_subject_template=email["subject"],
         email_subject_catchup_template=email["subject_catchup"],
         email_transport=email["transport"],
