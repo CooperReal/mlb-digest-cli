@@ -1,6 +1,7 @@
 # MLB Digest CLI
 
 [![CI](https://github.com/CooperReal/mlb-digest-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/CooperReal/mlb-digest-cli/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/CooperReal/mlb-digest-cli/graph/badge.svg)](https://codecov.io/gh/CooperReal/mlb-digest-cli)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
