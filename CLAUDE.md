@@ -46,13 +46,7 @@ uv run pytest tests/ -v          # Tests
 
 ## Pre-Push Checklist (MANDATORY)
 
-Before every commit/push, you MUST run all three and they MUST pass:
-
-```bash
-uv run pytest tests/ -v          # All tests pass
-uv run ruff check .              # No lint errors
-uv run mypy src/                 # No type errors
-```
+Before every commit/push, you MUST run `bash check.sh` and it MUST pass. This runs lint, type check, and tests in one shot.
 
 Never bypass pre-commit hooks (`--no-verify` is forbidden). If a hook fails, fix the issue.
 
