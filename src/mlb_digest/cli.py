@@ -39,8 +39,19 @@ logger = logging.getLogger(__name__)
 )
 @click.option("--no-email", is_flag=True, help="Print digest to stdout instead of emailing.")
 @click.option("--dry-run", is_flag=True, help="Print raw data without calling Sonnet or emailing.")
+@click.option(
+    "--smoke-test",
+    is_flag=True,
+    help="Run full pipeline with minimal tokens (Haiku, 50 max_tokens).",
+)
 @click.pass_context
-def main(ctx: click.Context, catchup: bool, no_email: bool, dry_run: bool) -> None:
+def main(
+    ctx: click.Context,
+    catchup: bool,
+    no_email: bool,
+    dry_run: bool,
+    smoke_test: bool,
+) -> None:
     """MLB Digest - daily team digest via email."""
     if ctx.invoked_subcommand is not None:
         return
@@ -97,13 +108,20 @@ def main(ctx: click.Context, catchup: bool, no_email: bool, dry_run: bool) -> No
 
     system_prompt = build_system_prompt(config.team_name)
 
+    narrator_model = config.narrator_model
+    narrator_max_tokens = 4096
+    if smoke_test:
+        narrator_model = "claude-haiku-4-5-20251001"
+        narrator_max_tokens = 50
+
     try:
         narrative = generate_narrative(
             prompt=prompt,
             system_prompt=system_prompt,
             api_key=config.anthropic_api_key,
-            model=config.narrator_model,
+            model=narrator_model,
             temperature=config.narrator_temperature,
+            max_tokens=narrator_max_tokens,
         )
     except NarratorError:
         logger.error("Narrator failed - sending raw data fallback")

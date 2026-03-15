@@ -97,6 +97,29 @@ def test_cli_no_email_prints_to_stdout():
     assert "Test Digest" in result.output
 
 
+def test_cli_smoke_test_uses_haiku_and_small_max_tokens():
+    runner = CliRunner()
+
+    top = {"top_hitters": [], "top_pitchers": []}
+    with (
+        patch("mlb_digest.cli.load_config", return_value=_make_mock_config()),
+        patch("mlb_digest.cli.get_yesterday_game", return_value=None),
+        patch("mlb_digest.cli.get_today_game", return_value=None),
+        patch("mlb_digest.cli.get_standings", return_value=[]),
+        patch("mlb_digest.cli.fetch_articles", return_value=[]),
+        patch("mlb_digest.cli.get_active_roster", return_value=[]),
+        patch("mlb_digest.cli.get_top_players", return_value=top),
+        patch("mlb_digest.cli.generate_narrative", return_value="## Smoke") as mock_narrate,
+        patch("mlb_digest.cli.send_email"),
+    ):
+        result = runner.invoke(main, ["--smoke-test"])
+
+    assert result.exit_code == 0
+    call_kwargs = mock_narrate.call_args[1]
+    assert call_kwargs["model"] == "claude-haiku-4-5-20251001"
+    assert call_kwargs["max_tokens"] == 50
+
+
 def test_cli_catchup_fetches_roster_data():
     from mlb_digest.mlb_api import RosterPlayer
 

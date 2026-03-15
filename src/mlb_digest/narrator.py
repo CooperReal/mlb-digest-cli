@@ -142,12 +142,13 @@ def generate_narrative(
     api_key: str,
     model: str,
     temperature: float,
+    max_tokens: int = 4096,
 ) -> str:
     try:
         client = anthropic.Anthropic(api_key=api_key)
         response = client.messages.create(
             model=model,
-            max_tokens=4096,
+            max_tokens=max_tokens,
             temperature=temperature,
             system=system_prompt,
             messages=[{"role": "user", "content": prompt}],
