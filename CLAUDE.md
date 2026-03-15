@@ -1,17 +1,69 @@
-# Braves Project
+# MLB Digest CLI
+
+Daily email digest for Atlanta Braves fans. Fetches game results, standings, news, and roster data from MLB APIs and RSS feeds, generates a narrative via Claude, and emails it.
 
 ## Tech Stack
 
-Python. _Update with frameworks/libraries as the project evolves._
+Python 3.11+, Click CLI, Anthropic SDK, MLB-StatsAPI, feedparser, httpx, Markdown, tenacity, python-dotenv. Linting via Ruff, type checking via mypy, tests via pytest.
+
+## Project Structure
+
+```
+src/mlb_digest/
+  cli.py          — Click CLI entry point (main command + test-email subcommand)
+  config.py       — Loads config.toml + env vars into Config dataclass
+  mlb_api.py      — MLB Stats API calls (games, standings, roster, player stats)
+  feeds.py        — RSS feed fetching, parsing, deduplication
+  narrator.py     — Claude API prompt building + narrative generation
+  emailer.py      — Gmail SMTP email sending
+  templates.py    — HTML/text email rendering from markdown
+```
+
+## Commands
+
+```bash
+uv run mlb-digest                # Full digest, sent via email
+uv run mlb-digest --catchup      # Includes roster, season overview, playoff picture
+uv run mlb-digest --no-email     # Print digest to stdout
+uv run mlb-digest --dry-run      # Dump raw data, no Claude call
+uv run mlb-digest test-email     # Send test email to verify Gmail setup
+uv run ruff check .              # Lint
+uv run mypy src/                 # Type check
+uv run pytest tests/ -v          # Tests
+```
+
+## Configuration
+
+- `config.toml` — Team settings, feed URLs, narrator model, email subject templates
+- `.env` — Secrets: `ANTHROPIC_API_KEY`, `GMAIL_ADDRESS`, `GMAIL_APP_PASSWORD`, `EMAIL_RECIPIENTS`
+- `EMAIL_RECIPIENTS` env var overrides `config.toml` recipients (comma-separated)
+
+## Secret Protection
+
+- `.env` is gitignored
+- Pre-commit hook via `detect-secrets` scans for leaked secrets before every commit
+- `.secrets.baseline` tracks known false positives (fake test passwords) — commit this file
+
+## Pre-Push Checklist (MANDATORY)
+
+Before every commit/push, you MUST run all three and they MUST pass:
+
+```bash
+uv run pytest tests/ -v          # All tests pass
+uv run ruff check .              # No lint errors
+uv run mypy src/                 # No type errors
+```
+
+Never bypass pre-commit hooks (`--no-verify` is forbidden). If a hook fails, fix the issue.
 
 ## Operating Principles
 
 ### 1. Plan First, Code Second
-- **Always enter Plan Mode before writing code.** Outline what changes, why, and what tests are needed.
+- Always enter Plan Mode before writing code. Outline what changes, why, and what tests are needed.
 - No plan is approved without a test strategy.
 
 ### 2. Maximize Subagent Usage
-- **Delegate aggressively.** Parallel subagents for exploration, testing, review.
+- Delegate aggressively. Parallel subagents for exploration, testing, review.
 - `subagent_type=Explore` for codebase investigation, `subagent_type=Plan` for architecture.
 - Run build/test agents in background when possible.
 - Keep main conversation context lean.
@@ -36,66 +88,17 @@ Python. _Update with frameworks/libraries as the project evolves._
 
 ### 6. Python & Code Style
 - **Readability is the priority.** If a stranger can't understand the code in 10 seconds, rewrite it.
-- **No indirection.** No unnecessary abstractions, wrapper functions, base classes, or design patterns for their own sake. Call the thing directly. One level of function calls to get to the actual work.
+- **No indirection.** No unnecessary abstractions, wrapper functions, base classes, or design patterns for their own sake.
 - **Flat is better than nested.** Early returns over nested conditionals. Simple loops over clever comprehensions.
 - **Explicit is better than implicit.** Name things clearly. No single-letter variables outside tight loops. No magic values.
 - **Functions do one thing and are short.** If it needs a comment explaining what a block does, that block should be its own function with a clear name instead.
 - **Type hints on all function signatures.** No `Any` unless truly unavoidable.
 - **No premature abstraction.** Three copies of similar code is fine. Don't DRY it up until you actually have a fourth.
+- **Ruff line-length is 100.** Check before committing.
 
 ### 7. Test Readability
-- Tests are documentation. A test should read like a spec — anyone should understand what behavior it verifies without reading the implementation.
+- Tests are documentation. A test should read like a spec.
 - **Arrange / Act / Assert** — always structured this way, with blank lines separating each phase.
-- Test names describe behavior: `test_empty_roster_returns_no_starters`, not `test_roster_1` or `test_edge_case`.
-- No test helpers that hide what's being tested. Setup logic lives in the test or in a clearly named fixture. If a test needs 20 lines of setup, that's fine — clarity over cleverness.
+- Test names describe behavior: `test_empty_roster_returns_no_starters`, not `test_roster_1`.
+- No test helpers that hide what's being tested.
 - One assertion per concept. Multiple `assert` calls are fine if they verify the same logical thing.
-
-## Knowledge Base
-
-The `.claude-kb/` folder is the project's long-term memory. It keeps detailed reference out of this file and available to subagents.
-
-```
-.claude-kb/
-  lessons/       — Problems hit during development and their fixes
-  patterns/      — Approved code patterns and examples
-  decisions/     — Architecture decisions and their rationale
-```
-
-**When to write to it:**
-- You hit a problem that took multiple attempts to solve
-- A library/tool behaved unexpectedly
-- A non-obvious project quirk was discovered
-- An architecture decision was made and needs rationale preserved
-
-**Format for lessons (`lessons/YYYY-MM-DD-short-title.md`):**
-```
-# Short Title
-**Problem:** What went wrong
-**Root Cause:** Why it went wrong
-**Fix:** What resolved it
-```
-
-**Subagents: read from `.claude-kb/` before starting work.** Check `lessons/` for known pitfalls related to your task.
-
-## Workflow
-
-```
-User request
-  → Plan Mode
-  → Explore agents gather context (check .claude-kb/lessons/ for prior issues)
-  → Draft plan with test strategy
-  → User approval
-  → Parallel implementation agents where possible
-  → Run tests (never skip)
-  → Code review via subagent
-  → If new lessons learned → write to .claude-kb/lessons/
-  → Terse result to user
-```
-
-## Commands
-
-```bash
-# Update as project takes shape
-# python -m pytest tests/ -v
-# python -m pytest tests/ -v --tb=short
-```
