@@ -1,0 +1,28 @@
+[team]
+id = 144
+name = "Braves"
+league_id = 104
+colors = { primary = "#13274F", accent = "#CE1141" }
+
+[email]
+recipients = ["you@gmail.com"]
+subject = "{team_name} Daily — {date}"
+subject_catchup = "{team_name} Catchup — {date}"
+transport = "gmail_smtp"
+
+[feeds.team]
+urls = [
+    "https://www.mlbtraderumors.com/atlanta-braves/feed",
+]
+
+[feeds.mlb]
+urls = [
+    "https://www.mlb.com/feeds/news/rss.xml",
+    "https://www.espn.com/espn/rss/mlb/news",
+    "https://www.mlbtraderumors.com/feed",
+    "https://blogs.fangraphs.com/feed/",
+]
+
+[narrator]
+model = "claude-sonnet-4-6"
+temperature = 0.7

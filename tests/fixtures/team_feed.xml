@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Braves Feed</title>
+    <item>
+      <title>Braves Sign New Closer in Blockbuster Deal</title>
+      <link>https://www.mlbtraderumors.com/braves-closer</link>
+      <description>The Atlanta Braves announced a major bullpen acquisition today, signing a top closer to a multi-year deal.</description>
+      <pubDate>Thu, 14 Mar 2026 10:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Spring Training Update: Rotation Takes Shape</title>
+      <link>https://www.mlbtraderumors.com/spring-rotation</link>
+      <description>With opening day approaching, the Braves rotation is starting to come together after a strong spring.</description>
+      <pubDate>Wed, 13 Mar 2026 14:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Injury Report: Key Outfielder Day-to-Day</title>
+      <link>https://www.mlbtraderumors.com/injury-report</link>
+      <description>A key outfielder left yesterday's game early with a hamstring issue and is listed as day-to-day.</description>
+      <pubDate>Tue, 12 Mar 2026 09:00:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>MLB News</title>
+    <item>
+      <title>MLB Announces Rule Changes for 2026 Season</title>
+      <link>https://www.mlb.com/rule-changes</link>
+      <description>Major League Baseball has announced a new set of rule changes taking effect this season.</description>
+      <pubDate>Thu, 14 Mar 2026 08:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Braves Sign New Closer in Blockbuster Deal</title>
+      <link>https://www.espn.com/braves-closer</link>
+      <description>The Braves announced a major bullpen acquisition today signing a top closer.</description>
+      <pubDate>Thu, 14 Mar 2026 10:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Top Prospect Called Up by Dodgers</title>
+      <link>https://www.mlb.com/dodgers-prospect</link>
+      <description>The Dodgers called up their top prospect from Triple-A ahead of opening day.</description>
+      <pubDate>Wed, 13 Mar 2026 16:00:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>
