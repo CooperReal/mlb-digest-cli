@@ -162,4 +162,7 @@ def generate_narrative(
     output_tokens = response.usage.output_tokens
     logger.info("Token usage - input: %d, output: %d", input_tokens, output_tokens)
 
-    return response.content[0].text
+    block = response.content[0]
+    if not hasattr(block, "text"):
+        raise NarratorError(f"Unexpected response block type: {type(block)}")
+    return block.text  # type: ignore[union-attr]
