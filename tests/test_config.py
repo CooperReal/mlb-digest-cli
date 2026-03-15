@@ -34,7 +34,8 @@ temperature = 0.7
     config_file = tmp_path / "config.toml"
     config_file.write_text(toml_content)
 
-    config = load_config(config_path=config_file)
+    with patch.dict(os.environ, {"EMAIL_RECIPIENTS": ""}, clear=False):
+        config = load_config(config_path=config_file)
 
     assert config.team_id == 144
     assert config.team_name == "Braves"

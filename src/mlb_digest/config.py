@@ -47,6 +47,12 @@ class Config:
         return template.format(team_name=self.team_name, date=date.today().strftime("%b %d, %Y"))
 
 
+def _parse_recipients(env_value: str, toml_fallback: list[str]) -> list[str]:
+    if env_value:
+        return [r.strip() for r in env_value.split(",") if r.strip()]
+    return toml_fallback
+
+
 def load_config(config_path: Path = DEFAULT_CONFIG_PATH) -> Config:
     load_dotenv()
 
@@ -63,7 +69,7 @@ def load_config(config_path: Path = DEFAULT_CONFIG_PATH) -> Config:
         team_name=team["name"],
         league_id=team["league_id"],
         team_colors=dict(team.get("colors", {})),
-        email_recipients=email["recipients"],
+        email_recipients=_parse_recipients(os.environ.get("EMAIL_RECIPIENTS", ""), email.get("recipients", [])),
         email_subject_template=email["subject"],
         email_subject_catchup_template=email["subject_catchup"],
         email_transport=email["transport"],

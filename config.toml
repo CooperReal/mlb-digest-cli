@@ -13,6 +13,7 @@ transport = "gmail_smtp"
 [feeds.team]
 urls = [
     "https://www.mlbtraderumors.com/atlanta-braves/feed",
+    "https://www.reddit.com/r/Braves/.rss",
 ]
 
 [feeds.mlb]
@@ -21,6 +22,7 @@ urls = [
     "https://www.espn.com/espn/rss/mlb/news",
     "https://www.mlbtraderumors.com/feed",
     "https://blogs.fangraphs.com/feed/",
+    "https://www.reddit.com/r/baseball/.rss",
 ]
 
 [narrator]
