@@ -4,6 +4,7 @@ Structural tests that enforce architectural boundaries and taste invariants.
 Every test failure is written as a remediation instruction so humans and AI
 agents can self-correct. These tests run in pre-commit and CI.
 """
+
 import ast
 from pathlib import Path
 
@@ -46,8 +47,10 @@ def _get_internal_imports(filepath: Path) -> list[str]:
     tree = ast.parse(filepath.read_text())
     imports: list[str] = []
     for node in ast.walk(tree):
-        if isinstance(node, ast.ImportFrom) and node.module and node.module.startswith(
-            "mlb_digest."
+        if (
+            isinstance(node, ast.ImportFrom)
+            and node.module
+            and node.module.startswith("mlb_digest.")
         ):
             imports.append(node.module.split(".")[-1])
     return imports
