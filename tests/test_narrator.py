@@ -227,15 +227,17 @@ def test_generate_narrative_raises_on_api_error():
     mock_client = MagicMock()
     mock_client.messages.create.side_effect = Exception("API down")
 
-    with patch("mlb_digest.narrator.anthropic.Anthropic", return_value=mock_client):
-        with pytest.raises(NarratorError, match="API down"):
-            generate_narrative(
-                prompt="test",
-                system_prompt="test",
-                api_key="sk-test",
-                model="claude-sonnet-4-6",
-                temperature=0.7,
-            )
+    with (
+        patch("mlb_digest.narrator.anthropic.Anthropic", return_value=mock_client),
+        pytest.raises(NarratorError, match="API down"),
+    ):
+        generate_narrative(
+            prompt="test",
+            system_prompt="test",
+            api_key="sk-test",
+            model="claude-sonnet-4-6",
+            temperature=0.7,
+        )
 
 
 def test_generate_narrative_raises_on_empty_content():
@@ -248,12 +250,14 @@ def test_generate_narrative_raises_on_empty_content():
     mock_client = MagicMock()
     mock_client.messages.create.return_value = mock_response
 
-    with patch("mlb_digest.narrator.anthropic.Anthropic", return_value=mock_client):
-        with pytest.raises(NarratorError, match="empty content"):
-            generate_narrative(
-                prompt="test prompt",
-                system_prompt="test system",
-                api_key="sk-test",
-                model="claude-sonnet-4-6",
-                temperature=0.7,
-            )
+    with (
+        patch("mlb_digest.narrator.anthropic.Anthropic", return_value=mock_client),
+        pytest.raises(NarratorError, match="empty content"),
+    ):
+        generate_narrative(
+            prompt="test prompt",
+            system_prompt="test system",
+            api_key="sk-test",
+            model="claude-sonnet-4-6",
+            temperature=0.7,
+        )

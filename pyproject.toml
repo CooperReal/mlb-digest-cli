@@ -37,7 +37,28 @@ target-version = "py311"
 line-length = 100
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "W"]
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes
+    "I",    # isort
+    "W",    # pycodestyle warnings
+    "T20",  # no print() in production code
+    "G",    # logging format — no f-strings, use .exception()
+    "ANN",  # type annotations on public functions
+    "B",    # bugbear — mutable defaults, bare except, etc.
+    "SIM",  # simplification — early returns, collapsed ifs
+    "UP",   # modern Python 3.11+ idioms
+    "PT",   # pytest conventions
+    "RUF",  # ruff-specific quality checks
+    "C4",   # unnecessary comprehension wrapping
+    "PIE",  # no-op statements, unnecessary pass
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+    "ANN",   # test functions don't need full annotations
+    "T20",   # print() is fine in tests for debugging
+]
 
 [tool.mypy]
 python_version = "3.11"

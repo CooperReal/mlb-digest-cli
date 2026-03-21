@@ -67,15 +67,17 @@ def test_deduplicate_removes_similar_titles():
 
 
 def test_failed_feed_logs_warning_and_returns_empty(caplog):
-    with caplog.at_level(logging.WARNING):
-        with patch(
+    with (
+        caplog.at_level(logging.WARNING),
+        patch(
             "mlb_digest.feeds._fetch_feed_content",
             side_effect=Exception("Connection refused"),
-        ):
-            articles = fetch_articles(
-                ["https://broken.example.com/feed"],
-                source_type="team",
-            )
+        ),
+    ):
+        articles = fetch_articles(
+            ["https://broken.example.com/feed"],
+            source_type="team",
+        )
 
     assert articles == []
     assert "Connection refused" in caplog.text

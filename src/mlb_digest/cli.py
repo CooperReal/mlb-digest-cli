@@ -157,7 +157,7 @@ def main(
             transport=config.email_transport,
         )
     except Exception:
-        logger.error("Failed to send email - printing to stdout", exc_info=True)
+        logger.exception("Failed to send email - printing to stdout")
         click.echo(narrative)
         ctx.exit(2)
         return
@@ -188,6 +188,6 @@ def test_email() -> None:
         )
         click.echo("Test email sent successfully!")
     except Exception as e:
-        logger.error("Test email failed", exc_info=True)
+        logger.exception("Test email failed")
         click.echo(f"Test email failed: {e}", err=True)
-        raise SystemExit(1)
+        raise SystemExit(1) from e

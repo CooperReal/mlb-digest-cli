@@ -188,18 +188,22 @@ def test_get_player_stats_returns_stats():
 
 
 def test_get_yesterday_game_handles_api_error(caplog):
-    with caplog.at_level(logging.WARNING):
-        with patch("mlb_digest.mlb_api._fetch_schedule", side_effect=Exception("API timeout")):
-            result = get_yesterday_game(team_id=144)
+    with (
+        caplog.at_level(logging.WARNING),
+        patch("mlb_digest.mlb_api._fetch_schedule", side_effect=Exception("API timeout")),
+    ):
+        result = get_yesterday_game(team_id=144)
 
     assert result is None
     assert "API timeout" in caplog.text
 
 
 def test_get_standings_handles_api_error(caplog):
-    with caplog.at_level(logging.WARNING):
-        with patch("mlb_digest.mlb_api.statsapi.standings_data", side_effect=Exception("API down")):
-            result = get_standings(league_id=104)
+    with (
+        caplog.at_level(logging.WARNING),
+        patch("mlb_digest.mlb_api.statsapi.standings_data", side_effect=Exception("API down")),
+    ):
+        result = get_standings(league_id=104)
 
     assert result == []
 
@@ -229,18 +233,22 @@ def test_get_top_players_returns_sorted_hitters_and_pitchers():
 
 
 def test_get_today_game_handles_api_error(caplog):
-    with caplog.at_level(logging.WARNING):
-        with patch("mlb_digest.mlb_api._fetch_schedule", side_effect=Exception("API timeout")):
-            result = get_today_game(team_id=144, team_name="Braves")
+    with (
+        caplog.at_level(logging.WARNING),
+        patch("mlb_digest.mlb_api._fetch_schedule", side_effect=Exception("API timeout")),
+    ):
+        result = get_today_game(team_id=144, team_name="Braves")
 
     assert result is None
     assert "API timeout" in caplog.text
 
 
 def test_get_active_roster_handles_api_error(caplog):
-    with caplog.at_level(logging.WARNING):
-        with patch("mlb_digest.mlb_api._fetch_roster", side_effect=Exception("Connection refused")):
-            result = get_active_roster(team_id=144)
+    with (
+        caplog.at_level(logging.WARNING),
+        patch("mlb_digest.mlb_api._fetch_roster", side_effect=Exception("Connection refused")),
+    ):
+        result = get_active_roster(team_id=144)
 
     assert result == []
     assert "Connection refused" in caplog.text
