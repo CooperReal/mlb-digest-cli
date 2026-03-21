@@ -68,8 +68,8 @@ def main(
     team_articles_raw = fetch_articles(config.team_feed_urls, source_type="team")
     mlb_articles_raw = fetch_articles(config.mlb_feed_urls, source_type="mlb")
     selected = select_articles(team_articles_raw, mlb_articles_raw)
-    team_articles = selected["team"]
-    mlb_articles = selected["mlb"]
+    team_articles = selected.team
+    mlb_articles = selected.mlb
 
     # Fetch roster for top players (always) and full roster (catchup only)
     roster = get_active_roster(config.team_id)

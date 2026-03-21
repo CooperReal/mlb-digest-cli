@@ -151,10 +151,10 @@ def test_select_articles_separates_by_source_type():
 
     result = select_articles(team_articles, mlb_articles, team_count=2, mlb_count=2)
 
-    assert len(result["team"]) == 2
-    assert len(result["mlb"]) == 2
-    assert all(a.source_type == "team" for a in result["team"])
-    assert all(a.source_type == "mlb" for a in result["mlb"])
+    assert len(result.team) == 2
+    assert len(result.mlb) == 2
+    assert all(a.source_type == "team" for a in result.team)
+    assert all(a.source_type == "mlb" for a in result.mlb)
 
 
 def test_select_articles_deduplicates_across_feeds():
@@ -186,5 +186,5 @@ def test_select_articles_deduplicates_across_feeds():
 
     result = select_articles(team_articles, mlb_articles, team_count=2, mlb_count=2)
 
-    all_titles = [a.title for a in result["team"] + result["mlb"]]
+    all_titles = [a.title for a in result.team + result.mlb]
     assert all_titles.count("Same Story") == 1

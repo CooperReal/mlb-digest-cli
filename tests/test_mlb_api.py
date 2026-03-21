@@ -6,6 +6,7 @@ from mlb_digest.mlb_api import (
     GameResult,
     PlayerStats,
     RosterPlayer,
+    TopPlayers,
     UpcomingGame,
     get_active_roster,
     get_player_stats,
@@ -226,10 +227,11 @@ def test_get_top_players_returns_sorted_hitters_and_pitchers():
     with patch("mlb_digest.mlb_api.get_player_stats", side_effect=mock_get_stats):
         result = get_top_players(roster)
 
-    assert result["top_hitters"][0]["name"] == "Hitter B"  # .320 > .300
-    assert result["top_hitters"][1]["name"] == "Hitter A"
-    assert len(result["top_pitchers"]) == 1
-    assert result["top_pitchers"][0]["name"] == "Pitcher A"
+    assert isinstance(result, TopPlayers)
+    assert result.top_hitters[0]["name"] == "Hitter B"  # .320 > .300
+    assert result.top_hitters[1]["name"] == "Hitter A"
+    assert len(result.top_pitchers) == 1
+    assert result.top_pitchers[0]["name"] == "Pitcher A"
 
 
 def test_get_today_game_handles_api_error(caplog):
@@ -273,4 +275,6 @@ def test_get_player_stats_returns_none_when_no_stats():
 def test_get_top_players_with_empty_roster():
     result = get_top_players([])
 
-    assert result == {"top_hitters": [], "top_pitchers": []}
+    assert isinstance(result, TopPlayers)
+    assert result.top_hitters == []
+    assert result.top_pitchers == []

@@ -7,6 +7,7 @@ from mlb_digest.mlb_api import (
     DivisionStandings,
     GameResult,
     TeamStanding,
+    TopPlayers,
 )
 from mlb_digest.narrator import NarratorError, build_prompt, build_system_prompt, generate_narrative
 
@@ -89,10 +90,10 @@ def test_build_prompt_includes_articles():
 
 
 def test_build_prompt_includes_top_players():
-    top_players = {
-        "top_hitters": [{"name": "Acuna", "avg": ".310", "homeRuns": 15}],
-        "top_pitchers": [{"name": "Sale", "era": "2.50", "wins": 8}],
-    }
+    top_players = TopPlayers(
+        top_hitters=[{"name": "Acuna", "avg": ".310", "homeRuns": 15}],
+        top_pitchers=[{"name": "Sale", "era": "2.50", "wins": 8}],
+    )
     standings = [
         DivisionStandings(
             division_name="NL East",

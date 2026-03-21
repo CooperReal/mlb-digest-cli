@@ -6,7 +6,7 @@ from dataclasses import asdict
 import anthropic
 
 from mlb_digest.feeds import Article
-from mlb_digest.mlb_api import DivisionStandings, GameResult, UpcomingGame
+from mlb_digest.mlb_api import DivisionStandings, GameResult, TopPlayers, UpcomingGame
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +57,7 @@ def build_prompt(
     standings: list[DivisionStandings],
     team_articles: list[Article],
     mlb_articles: list[Article],
-    top_players: dict | None,
+    top_players: TopPlayers | None,
     catchup: bool = False,
     roster_data: list[dict] | None = None,
 ) -> str:
@@ -108,7 +108,7 @@ def build_prompt(
             "data": [asdict(d) for d in standings],
         }
         if top_players:
-            standings_section["top_players"] = top_players
+            standings_section["top_players"] = asdict(top_players)
             standings_section["instruction"] += (
                 f" Include top hitters (by AVG) and top pitchers (by ERA) for {team_name}."
             )

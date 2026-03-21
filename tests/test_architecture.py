@@ -118,7 +118,6 @@ def test_every_module_has_tests(module: str) -> None:
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.xfail(reason="Task 3 will replace with SelectedArticles dataclass")
 def test_no_raw_dict_returns_at_boundaries() -> None:
     """Public functions in data modules must return dataclasses, not raw dicts."""
     boundary_modules = ["mlb_api", "feeds", "config"]
