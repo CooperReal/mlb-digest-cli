@@ -52,6 +52,12 @@ Before every commit/push, you MUST run `bash check.sh` and it MUST pass. This ru
 
 Never bypass pre-commit hooks (`--no-verify` is forbidden). If a hook fails, fix the issue.
 
+## Pull Request & Merge Policy
+
+- **Squash and merge only.** The repo is configured to only allow squash merges — no merge commits, no rebase merges.
+- **Branch auto-delete is on.** Feature branches are deleted automatically after merge.
+- **CI must pass before merge.** Both `check` and `smoke-test` jobs must be green.
+
 ## Operating Principles
 
 ### 1. Plan First, Code Second
