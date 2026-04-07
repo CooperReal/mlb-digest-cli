@@ -20,6 +20,8 @@ jobs:
       - run: uv run ruff format --check src/ tests/
       - run: uv run mypy src/mlb_digest/
       - run: uv run pytest tests/ -v --cov=mlb_digest --cov-report=term
+      - name: Verify teams registry
+        run: uv run mlb-digest list-teams --json-output | python -c "import json,sys; d=json.load(sys.stdin); assert len(d)==6; assert sum(len(v) for v in d.values())==30; print('30 teams across 6 divisions OK')"
 
   smoke-test:
     runs-on: ubuntu-latest
