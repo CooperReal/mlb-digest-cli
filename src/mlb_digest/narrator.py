@@ -53,7 +53,8 @@ def build_system_prompt(
         team_name=team_name,
         full_team_name=full_team_name or team_name,
         division=division or "MLB",
-        narrator_hint=narrator_hint or (
+        narrator_hint=narrator_hint
+        or (
             f"Write like a dedicated {team_name} fan — "
             "knowledgeable, conversational, and genuinely invested."
         ),

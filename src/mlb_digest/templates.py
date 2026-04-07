@@ -92,8 +92,7 @@ def render_email_html(
         "font-weight: normal; letter-spacing: 0.5px;"
     )
     content_style = (
-        f"padding: 24px 30px 20px; color: {secondary_color}; "
-        "line-height: 1.6; font-size: 15px;"
+        f"padding: 24px 30px 20px; color: {secondary_color}; line-height: 1.6; font-size: 15px;"
     )
     footer_style = (
         f"background-color: #fafafa; padding: 15px 30px; font-size: 12px; "
@@ -138,10 +137,6 @@ def render_email_text(md_content: str, team_name: str = "MLB Digest") -> str:
     text = re.sub(r"\[(.+?)\]\((.+?)\)", r"\1 (\2)", text)
     text = re.sub(r"^#{1,3} ", "", text, flags=re.MULTILINE)
 
-    text += (
-        f"\n\n---\n"
-        f"{team_name} Digest\n"
-        f"Sources: MLB Stats API, RSS feeds. Narrated by Claude.\n"
-    )
+    text += f"\n\n---\n{team_name} Digest\nSources: MLB Stats API, RSS feeds. Narrated by Claude.\n"
 
     return text.strip()

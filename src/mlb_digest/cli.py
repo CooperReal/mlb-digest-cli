@@ -191,8 +191,7 @@ def test_email() -> None:
                 "</body></html>"
             ),
             text_body=(
-                "Hello from MLB Digest! Your email setup works. "
-                f"Team: {config.full_team_name}"
+                f"Hello from MLB Digest! Your email setup works. Team: {config.full_team_name}"
             ),
             sender=config.gmail_address,
             password=config.gmail_app_password,

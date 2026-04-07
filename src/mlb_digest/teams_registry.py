@@ -708,17 +708,41 @@ GIANTS = TeamInfo(
 # Master list of all teams — order matches the divisions above
 ALL_TEAMS: tuple[TeamInfo, ...] = (
     # AL East
-    ORIOLES, RED_SOX, YANKEES, RAYS, BLUE_JAYS,
+    ORIOLES,
+    RED_SOX,
+    YANKEES,
+    RAYS,
+    BLUE_JAYS,
     # AL Central
-    WHITE_SOX, GUARDIANS, TIGERS, ROYALS, TWINS,
+    WHITE_SOX,
+    GUARDIANS,
+    TIGERS,
+    ROYALS,
+    TWINS,
     # AL West
-    ASTROS, ANGELS, ATHLETICS, MARINERS, RANGERS,
+    ASTROS,
+    ANGELS,
+    ATHLETICS,
+    MARINERS,
+    RANGERS,
     # NL East
-    BRAVES, MARLINS, METS, PHILLIES, NATIONALS,
+    BRAVES,
+    MARLINS,
+    METS,
+    PHILLIES,
+    NATIONALS,
     # NL Central
-    CUBS, REDS, BREWERS, PIRATES, CARDINALS,
+    CUBS,
+    REDS,
+    BREWERS,
+    PIRATES,
+    CARDINALS,
     # NL West
-    DIAMONDBACKS, ROCKIES, DODGERS, PADRES, GIANTS,
+    DIAMONDBACKS,
+    ROCKIES,
+    DODGERS,
+    PADRES,
+    GIANTS,
 )
 
 # Build lookup indexes — case-insensitive matching
@@ -729,8 +753,12 @@ _BY_ID: dict[int, TeamInfo] = {t.team_id: t for t in ALL_TEAMS}
 
 # Division ordering for display
 DIVISION_ORDER = (
-    "AL East", "AL Central", "AL West",
-    "NL East", "NL Central", "NL West",
+    "AL East",
+    "AL Central",
+    "AL West",
+    "NL East",
+    "NL Central",
+    "NL West",
 )
 
 
@@ -752,11 +780,7 @@ def get_team(identifier: str | int) -> TeamInfo | None:
     key = identifier.strip().lower()
 
     # Try each index in order: abbreviation first (fastest), then names
-    return (
-        _BY_ABBREVIATION.get(key)
-        or _BY_SHORT_NAME.get(key)
-        or _BY_FULL_NAME.get(key)
-    )
+    return _BY_ABBREVIATION.get(key) or _BY_SHORT_NAME.get(key) or _BY_FULL_NAME.get(key)
 
 
 def list_teams() -> dict[str, list[TeamInfo]]:
