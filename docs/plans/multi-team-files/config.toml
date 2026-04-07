@@ -1,0 +1,38 @@
+# =============================================================================
+# MLB Digest — Configuration
+# =============================================================================
+# Just set your team name below. Everything else has smart defaults.
+# Run `mlb-digest list-teams` to see all available teams.
+#
+# You can use the short name ("Yankees"), abbreviation ("NYY"),
+# or full name ("New York Yankees").
+# =============================================================================
+
+[team]
+name = "Braves"
+
+# Optional overrides — uncomment to customize:
+# display_name = "ATL Braves"                 # Custom display name
+# emoji = "🪓"                                # Override default emoji
+# colors = { primary = "#13274F", accent = "#CE1141" }  # Override colors
+
+[email]
+recipients = ["you@gmail.com"]
+# subject = "{emoji} {team_name} Daily — {date}"
+# subject_catchup = "{emoji} {team_name} Catchup — {date}"
+# transport = "gmail_smtp"
+
+# Optional: override the auto-detected team RSS feeds
+# [feeds.team]
+# urls = ["https://www.mlbtraderumors.com/atlanta-braves/feed"]
+
+# Optional: override the default MLB-wide feeds
+# [feeds.mlb]
+# urls = [
+#     "https://www.mlb.com/feeds/news/rss.xml",
+#     "https://www.espn.com/espn/rss/mlb/news",
+# ]
+
+[narrator]
+model = "claude-sonnet-4-6"
+temperature = 0.7

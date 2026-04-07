@@ -1,3 +1,10 @@
+"""
+Claude narrator — builds prompts and generates the digest narrative.
+
+The system prompt now includes a team-specific personality hint from the
+registry, so a Yankees digest reads differently from a Padres digest.
+"""
+
 import json
 import logging
 from collections import OrderedDict
@@ -6,7 +13,7 @@ from dataclasses import asdict
 import anthropic
 
 from mlb_digest.feeds import Article
-from mlb_digest.mlb_api import DivisionStandings, GameResult, TopPlayers, UpcomingGame
+from mlb_digest.mlb_api import DivisionStandings, GameResult, UpcomingGame
 
 logger = logging.getLogger(__name__)
 
@@ -49,6 +56,12 @@ def build_system_prompt(
     division: str = "",
     narrator_hint: str = "",
 ) -> str:
+    """
+    Build the system prompt with team-specific personality.
+
+    If full_team_name, division, or narrator_hint are not provided,
+    falls back to generic defaults (backward compatible).
+    """
     return SYSTEM_PROMPT_TEMPLATE.format(
         team_name=team_name,
         full_team_name=full_team_name or team_name,
@@ -74,7 +87,7 @@ def build_prompt(
     standings: list[DivisionStandings],
     team_articles: list[Article],
     mlb_articles: list[Article],
-    top_players: TopPlayers | None,
+    top_players: dict | None,
     catchup: bool = False,
     roster_data: list[dict] | None = None,
 ) -> str:
@@ -125,7 +138,7 @@ def build_prompt(
             "data": [asdict(d) for d in standings],
         }
         if top_players:
-            standings_section["top_players"] = asdict(top_players)
+            standings_section["top_players"] = top_players
             standings_section["instruction"] += (
                 f" Include top hitters (by AVG) and top pitchers (by ERA) for {team_name}."
             )

@@ -35,6 +35,7 @@ where = ["src"]
 [tool.ruff]
 target-version = "py311"
 line-length = 100
+extend-exclude = ["docs/plans/multi-team-files"]
 
 [tool.ruff.lint]
 select = [
@@ -66,6 +67,8 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = ["live: hits the real MLB Stats API (deselect with -m 'not live')"]
+addopts = "-m 'not live'"
 
 [dependency-groups]
 dev = [

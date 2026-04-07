@@ -57,3 +57,42 @@ def test_render_email_text_strips_markdown():
     assert "Hello" in text
     assert "Item 1" in text
     assert "MLB Stats API" in text
+
+
+def test_render_email_html_includes_team_name_in_header():
+    md = "## Test\n\nContent."
+
+    html = render_email_html(
+        md,
+        team_name="Atlanta Braves",
+        primary_color="#13274F",
+        accent_color="#CE1141",
+        secondary_color="#CE1141",
+        emoji="\U0001fa93",
+    )
+
+    assert "Atlanta Braves" in html
+    assert "\U0001fa93" in html
+
+
+def test_render_email_html_uses_secondary_color():
+    md = "## Test\n\nContent."
+
+    html = render_email_html(
+        md,
+        team_name="Atlanta Braves",
+        primary_color="#13274F",
+        accent_color="#CE1141",
+        secondary_color="#666666",
+        emoji="\U0001fa93",
+    )
+
+    assert "#666666" in html
+
+
+def test_render_email_text_includes_team_name():
+    md = "## Hello\n\nSome content."
+
+    text = render_email_text(md, team_name="Atlanta Braves")
+
+    assert "Atlanta Braves" in text

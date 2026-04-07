@@ -1,3 +1,16 @@
+"""
+CLI entry point for MLB Digest.
+
+Commands:
+    mlb-digest                     Send the daily digest email
+    mlb-digest --no-email          Print digest to terminal
+    mlb-digest --catchup           Include roster, season overview, rivals
+    mlb-digest --dry-run           Dump raw data, no Claude call
+    mlb-digest test-email          Verify Gmail setup
+    mlb-digest list-teams          Show all 30 available teams
+    mlb-digest list-teams --json   Machine-readable team list
+"""
+
 import json
 import logging
 import sys
@@ -68,8 +81,8 @@ def main(
     team_articles_raw = fetch_articles(config.team_feed_urls, source_type="team")
     mlb_articles_raw = fetch_articles(config.mlb_feed_urls, source_type="mlb")
     selected = select_articles(team_articles_raw, mlb_articles_raw)
-    team_articles = selected.team
-    mlb_articles = selected.mlb
+    team_articles = selected["team"]
+    mlb_articles = selected["mlb"]
 
     # Fetch roster for top players (always) and full roster (catchup only)
     roster = get_active_roster(config.team_id)
@@ -95,7 +108,7 @@ def main(
         click.echo(json.dumps(data, indent=2, default=str))
         return
 
-    # Build prompt and generate narrative
+    # Build prompt and generate narrative — now with team personality
     prompt = build_prompt(
         team_name=config.team_name,
         yesterday_game=yesterday_game,
@@ -167,7 +180,7 @@ def main(
             transport=config.email_transport,
         )
     except Exception:
-        logger.exception("Failed to send email - printing to stdout")
+        logger.error("Failed to send email - printing to stdout", exc_info=True)
         click.echo(narrative)
         ctx.exit(2)
         return
@@ -190,10 +203,7 @@ def test_email() -> None:
                 f"<p>Your email setup works. Configured for: {config.full_team_name}</p>"
                 "</body></html>"
             ),
-            text_body=(
-                "Hello from MLB Digest! Your email setup works. "
-                f"Team: {config.full_team_name}"
-            ),
+            text_body=f"Hello from MLB Digest! Your email setup works. Team: {config.full_team_name}",
             sender=config.gmail_address,
             password=config.gmail_app_password,
             recipients=config.email_recipients,
@@ -201,9 +211,9 @@ def test_email() -> None:
         )
         click.echo("Test email sent successfully!")
     except Exception as e:
-        logger.exception("Test email failed")
+        logger.error("Test email failed", exc_info=True)
         click.echo(f"Test email failed: {e}", err=True)
-        raise SystemExit(1) from e
+        raise SystemExit(1)
 
 
 @main.command("list-teams")

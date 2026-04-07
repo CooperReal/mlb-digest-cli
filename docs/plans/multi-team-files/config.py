@@ -105,12 +105,16 @@ def _resolve_team(toml_team: dict) -> TeamInfo:
 
         [team]
         name = "NYY"
+
+        [team]
+        id = 147
     """
+    # Try name first, then ID
     identifier = toml_team.get("name") or toml_team.get("id")
     if identifier is None:
         raise ValueError(
             "config.toml [team] section must have a 'name' field. "
-            'Example: name = "Yankees"'
+            "Example: name = \"Yankees\""
         )
     return get_team_or_raise(identifier)
 
@@ -151,8 +155,8 @@ def load_config(config_path: Path = DEFAULT_CONFIG_PATH) -> Config:
     )
 
     # Subject line defaults include the emoji
-    default_subject = "{emoji} {team_name} Daily \u2014 {date}"
-    default_subject_catchup = "{emoji} {team_name} Catchup \u2014 {date}"
+    default_subject = "{emoji} {team_name} Daily — {date}"
+    default_subject_catchup = "{emoji} {team_name} Catchup — {date}"
 
     return Config(
         # Team identity

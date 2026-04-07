@@ -21,6 +21,29 @@ def test_build_system_prompt_includes_team_name_and_rules():
     assert "Output the sections in the order" in prompt
 
 
+def test_build_system_prompt_includes_personality_and_division():
+    prompt = build_system_prompt(
+        team_name="Yankees",
+        full_team_name="New York Yankees",
+        division="AL East",
+        narrator_hint="Write like a proud Bronx fan who expects championships.",
+    )
+
+    assert "Yankees" in prompt
+    assert "AL East" in prompt
+    assert "Bronx" in prompt
+    assert "PERSONALITY" in prompt
+    assert "CRITICAL RULES" in prompt
+
+
+def test_build_system_prompt_falls_back_without_optional_args():
+    prompt = build_system_prompt("Braves")
+
+    assert "Braves" in prompt
+    assert "CRITICAL RULES" in prompt
+    assert "MLB" in prompt
+
+
 def test_build_prompt_includes_game_result():
     game = GameResult(
         home_team="Braves",

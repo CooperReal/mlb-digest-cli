@@ -1,0 +1,21 @@
+# Cubs fan config — with some custom overrides
+[team]
+name = "Cubs"
+display_name = "Cubbies"               # Shows "Cubbies" instead of "Cubs" in emails
+colors = { accent = "#CC3433" }         # Override just the accent color
+
+[email]
+recipients = ["your-email@gmail.com", "dad@gmail.com"]
+subject = "🐻 {team_name} Morning Report — {date}"
+
+# Add an extra team-specific blog
+[feeds.team]
+urls = [
+    "https://www.mlbtraderumors.com/chicago-cubs/feed",
+    "https://www.reddit.com/r/CHICubs/.rss",
+    "https://www.bleedcubbieblue.com/rss/current",
+]
+
+[narrator]
+model = "claude-sonnet-4-6"
+temperature = 0.7
