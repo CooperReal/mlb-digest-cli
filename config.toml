@@ -1,29 +1,12 @@
+# MLB Digest — Configuration
+# Just set your team name below. Everything else has smart defaults.
+# Run `mlb-digest list-teams` to see all available teams.
+
 [team]
-id = 144
 name = "Braves"
-league_id = 104
-colors = { primary = "#13274F", accent = "#CE1141" }
 
 [email]
 recipients = ["you@gmail.com"]
-subject = "{team_name} Daily — {date}"
-subject_catchup = "{team_name} Catchup — {date}"
-transport = "gmail_smtp"
-
-[feeds.team]
-urls = [
-    "https://www.mlbtraderumors.com/atlanta-braves/feed",
-    "https://www.reddit.com/r/Braves/.rss",
-]
-
-[feeds.mlb]
-urls = [
-    "https://www.mlb.com/feeds/news/rss.xml",
-    "https://www.espn.com/espn/rss/mlb/news",
-    "https://www.mlbtraderumors.com/feed",
-    "https://blogs.fangraphs.com/feed/",
-    "https://www.reddit.com/r/baseball/.rss",
-]
 
 [narrator]
 model = "claude-sonnet-4-6"

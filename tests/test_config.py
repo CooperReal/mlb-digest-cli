@@ -323,6 +323,27 @@ temperature = 0.7
         load_config(config_path=config_file)
 
 
+def test_env_recipients_override_toml_recipients(tmp_path: Path):
+    toml_content = """
+[team]
+name = "Braves"
+
+[email]
+recipients = ["toml@example.com"]
+
+[narrator]
+model = "claude-sonnet-4-6"
+temperature = 0.7
+"""
+    config_file = tmp_path / "config.toml"
+    config_file.write_text(toml_content)
+
+    with patch.dict(os.environ, {"EMAIL_RECIPIENTS": "env1@example.com, env2@example.com"}):
+        config = load_config(config_path=config_file)
+
+    assert config.email_recipients == ["env1@example.com", "env2@example.com"]
+
+
 def test_format_subject_includes_emoji(tmp_path: Path):
     toml_content = """
 [team]

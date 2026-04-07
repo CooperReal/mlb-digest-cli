@@ -6,35 +6,6 @@ from click.testing import CliRunner
 from mlb_digest.cli import main
 
 
-def _make_mock_config(**overrides) -> MagicMock:
-    """Build a mock config with sensible defaults. Override any field via kwargs."""
-    defaults = {
-        "team_id": 144,
-        "team_name": "Braves",
-        "full_team_name": "Atlanta Braves",
-        "league_id": 104,
-        "division": "NL East",
-        "team_feed_urls": [],
-        "mlb_feed_urls": [],
-        "anthropic_api_key": "sk-test",
-        "narrator_model": "claude-sonnet-4-6",
-        "narrator_temperature": 0.7,
-        "team_colors": {"primary": "#13274F", "accent": "#CE1141", "secondary": "#CE1141"},
-        "team_emoji": "\U0001fa93",
-        "narrator_hint": "Write like a Braves fan.",
-        "email_recipients": ["test@example.com"],
-        "email_transport": "gmail_smtp",
-        "gmail_address": "test@gmail.com",
-        "gmail_app_password": "pw",
-    }
-    defaults.update(overrides)
-    mock = MagicMock()
-    for key, value in defaults.items():
-        setattr(mock, key, value)
-    mock.format_subject.return_value = "Braves Daily - Mar 14, 2026"
-    return mock
-
-
 def test_cli_help_shows_usage():
     runner = CliRunner()
 
@@ -46,12 +17,12 @@ def test_cli_help_shows_usage():
     assert "dry-run" in result.output
 
 
-def test_cli_test_email_subcommand():
+def test_cli_test_email_subcommand(mock_config: MagicMock):
     runner = CliRunner()
 
     with (
         patch("mlb_digest.cli.send_email") as mock_send,
-        patch("mlb_digest.cli.load_config", return_value=_make_mock_config()),
+        patch("mlb_digest.cli.load_config", return_value=mock_config),
     ):
         result = runner.invoke(main, ["test-email"])
 
@@ -59,12 +30,12 @@ def test_cli_test_email_subcommand():
     mock_send.assert_called_once()
 
 
-def test_cli_dry_run_does_not_call_narrator_or_emailer():
+def test_cli_dry_run_does_not_call_narrator_or_emailer(mock_config: MagicMock):
     runner = CliRunner()
 
     top = {"top_hitters": [], "top_pitchers": []}
     with (
-        patch("mlb_digest.cli.load_config", return_value=_make_mock_config()),
+        patch("mlb_digest.cli.load_config", return_value=mock_config),
         patch("mlb_digest.cli.get_yesterday_game", return_value=None),
         patch("mlb_digest.cli.get_today_game", return_value=None),
         patch("mlb_digest.cli.get_standings", return_value=[]),
@@ -80,12 +51,12 @@ def test_cli_dry_run_does_not_call_narrator_or_emailer():
     mock_send.assert_not_called()
 
 
-def test_cli_no_email_prints_to_stdout():
+def test_cli_no_email_prints_to_stdout(mock_config: MagicMock):
     runner = CliRunner()
 
     top = {"top_hitters": [], "top_pitchers": []}
     with (
-        patch("mlb_digest.cli.load_config", return_value=_make_mock_config()),
+        patch("mlb_digest.cli.load_config", return_value=mock_config),
         patch("mlb_digest.cli.get_yesterday_game", return_value=None),
         patch("mlb_digest.cli.get_today_game", return_value=None),
         patch("mlb_digest.cli.get_standings", return_value=[]),
@@ -102,12 +73,12 @@ def test_cli_no_email_prints_to_stdout():
     assert "Test Digest" in result.output
 
 
-def test_cli_smoke_test_uses_haiku_and_small_max_tokens():
+def test_cli_smoke_test_uses_haiku_and_small_max_tokens(mock_config: MagicMock):
     runner = CliRunner()
 
     top = {"top_hitters": [], "top_pitchers": []}
     with (
-        patch("mlb_digest.cli.load_config", return_value=_make_mock_config()),
+        patch("mlb_digest.cli.load_config", return_value=mock_config),
         patch("mlb_digest.cli.get_yesterday_game", return_value=None),
         patch("mlb_digest.cli.get_today_game", return_value=None),
         patch("mlb_digest.cli.get_standings", return_value=[]),
@@ -125,7 +96,7 @@ def test_cli_smoke_test_uses_haiku_and_small_max_tokens():
     assert call_kwargs["max_tokens"] == 50
 
 
-def test_cli_catchup_fetches_roster_data():
+def test_cli_catchup_fetches_roster_data(mock_config: MagicMock):
     from mlb_digest.mlb_api import RosterPlayer
 
     runner = CliRunner()
@@ -133,7 +104,7 @@ def test_cli_catchup_fetches_roster_data():
 
     top = {"top_hitters": [], "top_pitchers": []}
     with (
-        patch("mlb_digest.cli.load_config", return_value=_make_mock_config()),
+        patch("mlb_digest.cli.load_config", return_value=mock_config),
         patch("mlb_digest.cli.get_yesterday_game", return_value=None),
         patch("mlb_digest.cli.get_today_game", return_value=None),
         patch("mlb_digest.cli.get_standings", return_value=[]),
@@ -148,7 +119,6 @@ def test_cli_catchup_fetches_roster_data():
         result = runner.invoke(main, ["--catchup", "--no-email"])
 
     mock_roster_call.assert_called_once()
-    # Verify roster data was passed to build_prompt via generate_narrative
     assert "Roster" in result.output or "Acuna" in result.output
 
 

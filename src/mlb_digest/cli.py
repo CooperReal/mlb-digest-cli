@@ -209,7 +209,7 @@ def test_email() -> None:
 @click.option("--json-output", "as_json", is_flag=True, help="Output as JSON.")
 def list_teams_cmd(as_json: bool) -> None:
     """Show all 30 available MLB teams."""
-    from mlb_digest.teams_registry import list_teams
+    from mlb_digest.teams_registry import list_teams  # lazy: avoid circular + only needed here
 
     grouped = list_teams()
 

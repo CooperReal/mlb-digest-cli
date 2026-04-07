@@ -13,26 +13,7 @@ from mlb_digest.mlb_api import (
 from mlb_digest.narrator import NarratorError
 
 
-def _make_mock_config() -> MagicMock:
-    mock = MagicMock()
-    mock.team_id = 144
-    mock.team_name = "Braves"
-    mock.league_id = 104
-    mock.team_feed_urls = []
-    mock.mlb_feed_urls = []
-    mock.anthropic_api_key = "sk-test"
-    mock.narrator_model = "claude-sonnet-4-6"
-    mock.narrator_temperature = 0.7
-    mock.team_colors = {"primary": "#13274F", "accent": "#CE1141"}
-    mock.email_recipients = ["test@example.com"]
-    mock.email_transport = "gmail_smtp"
-    mock.gmail_address = "test@gmail.com"
-    mock.gmail_app_password = "pw"
-    mock.format_subject.return_value = "Braves Daily - Mar 15, 2026"
-    return mock
-
-
-def test_full_pipeline_game_day_no_email():
+def test_full_pipeline_game_day_no_email(mock_config: MagicMock):
     """Full pipeline: game day data -> narrator -> stdout (no email)."""
     runner = CliRunner()
 
@@ -71,7 +52,7 @@ def test_full_pipeline_game_day_no_email():
     )
 
     with (
-        patch("mlb_digest.cli.load_config", return_value=_make_mock_config()),
+        patch("mlb_digest.cli.load_config", return_value=mock_config),
         patch("mlb_digest.cli.get_yesterday_game", return_value=game),
         patch("mlb_digest.cli.get_today_game", return_value=today),
         patch("mlb_digest.cli.get_standings", return_value=standings),
@@ -89,7 +70,7 @@ def test_full_pipeline_game_day_no_email():
     assert "Phillies" in result.output
 
 
-def test_full_pipeline_off_day_no_email():
+def test_full_pipeline_off_day_no_email(mock_config: MagicMock):
     """Off day - no game sections, still sends standings."""
     runner = CliRunner()
 
@@ -105,7 +86,7 @@ def test_full_pipeline_off_day_no_email():
     narrative = "## Standings\n\nBraves sit atop the NL East at 5-2."
 
     with (
-        patch("mlb_digest.cli.load_config", return_value=_make_mock_config()),
+        patch("mlb_digest.cli.load_config", return_value=mock_config),
         patch("mlb_digest.cli.get_yesterday_game", return_value=None),
         patch("mlb_digest.cli.get_today_game", return_value=None),
         patch("mlb_digest.cli.get_standings", return_value=standings),
@@ -120,12 +101,12 @@ def test_full_pipeline_off_day_no_email():
     assert "Standings" in result.output
 
 
-def test_full_pipeline_narrator_failure_exits_code_1():
+def test_full_pipeline_narrator_failure_exits_code_1(mock_config: MagicMock):
     """Narrator fails -> CLI sends raw fallback and exits with code 1."""
     runner = CliRunner()
 
     with (
-        patch("mlb_digest.cli.load_config", return_value=_make_mock_config()),
+        patch("mlb_digest.cli.load_config", return_value=mock_config),
         patch("mlb_digest.cli.get_yesterday_game", return_value=None),
         patch("mlb_digest.cli.get_today_game", return_value=None),
         patch("mlb_digest.cli.get_standings", return_value=[]),
@@ -140,14 +121,14 @@ def test_full_pipeline_narrator_failure_exits_code_1():
     assert "AI narrative unavailable" in result.output
 
 
-def test_full_pipeline_email_failure_exits_code_2():
+def test_full_pipeline_email_failure_exits_code_2(mock_config: MagicMock):
     """Email send fails -> CLI prints to stdout and exits with code 2."""
     runner = CliRunner()
 
     narrative = "## Test\n\nContent."
 
     with (
-        patch("mlb_digest.cli.load_config", return_value=_make_mock_config()),
+        patch("mlb_digest.cli.load_config", return_value=mock_config),
         patch("mlb_digest.cli.get_yesterday_game", return_value=None),
         patch("mlb_digest.cli.get_today_game", return_value=None),
         patch("mlb_digest.cli.get_standings", return_value=[]),
@@ -163,7 +144,7 @@ def test_full_pipeline_email_failure_exits_code_2():
     assert "Test" in result.output
 
 
-def test_full_pipeline_catchup_passes_roster_to_narrator():
+def test_full_pipeline_catchup_passes_roster_to_narrator(mock_config: MagicMock):
     """--catchup flag triggers roster fetch and passes roster data to narrator."""
     runner = CliRunner()
     mock_roster = [
@@ -173,7 +154,7 @@ def test_full_pipeline_catchup_passes_roster_to_narrator():
     narrative = "## Roster\n\nRonald Acuna Jr. - RF, leads team in SB."
 
     with (
-        patch("mlb_digest.cli.load_config", return_value=_make_mock_config()),
+        patch("mlb_digest.cli.load_config", return_value=mock_config),
         patch("mlb_digest.cli.get_yesterday_game", return_value=None),
         patch("mlb_digest.cli.get_today_game", return_value=None),
         patch("mlb_digest.cli.get_standings", return_value=[]),
@@ -186,7 +167,6 @@ def test_full_pipeline_catchup_passes_roster_to_narrator():
 
     assert result.exit_code == 0
     assert "Roster" in result.output
-    # Verify build_prompt received catchup=True and roster_data
     call_kwargs = mock_narrate.call_args
     kwargs = call_kwargs[1] or {}
     prompt_str = kwargs["prompt"] if "prompt" in kwargs else call_kwargs[0][0]

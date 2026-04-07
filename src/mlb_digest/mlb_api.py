@@ -57,13 +57,13 @@ class RosterPlayer:
 class PlayerStats:
     player_id: int
     group: str
-    stats: dict
+    stats: dict[str, str | int | float]
 
 
 @dataclass
 class TopPlayers:
-    top_hitters: list[dict]
-    top_pitchers: list[dict]
+    top_hitters: list[dict[str, str | int | float]]
+    top_pitchers: list[dict[str, str | int | float]]
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=4), reraise=True)
@@ -117,7 +117,8 @@ def get_today_game(team_id: int, team_name: str) -> UpcomingGame | None:
     game = games[0]
     home_name = game.get("home_name", "Unknown")
     away_name = game.get("away_name", "Unknown")
-    is_home = team_name.lower() in home_name.lower()
+    home_id = game.get("home_id", 0)
+    is_home = home_id == team_id
     opponent = away_name if is_home else home_name
 
     return UpcomingGame(
@@ -204,10 +205,10 @@ def get_top_players(
     roster: list[RosterPlayer],
     count: int = 3,
 ) -> TopPlayers:
-    hitters: list[dict] = []
-    pitchers: list[dict] = []
+    hitters: list[dict[str, str | int | float]] = []
+    pitchers: list[dict[str, str | int | float]] = []
 
-    def fetch_stats(player: RosterPlayer) -> tuple[str, dict | None]:
+    def fetch_stats(player: RosterPlayer) -> tuple[str, dict[str, str | int | float] | None]:
         group = "pitching" if player.position == "P" else "hitting"
         stats = get_player_stats(player.player_id, group=group)
         if stats and stats.stats:
