@@ -105,11 +105,16 @@ def _resolve_team(toml_team: dict) -> TeamInfo:
 
         [team]
         name = "NYY"
+
+        [team]
+        id = 147
     """
+    # Try name first, then ID
     identifier = toml_team.get("name") or toml_team.get("id")
     if identifier is None:
         raise ValueError(
-            "config.toml [team] section must have a 'name' field. Example: name = \"Yankees\""
+            "config.toml [team] section must have a 'name' field. "
+            "Example: name = \"Yankees\""
         )
     return get_team_or_raise(identifier)
 
@@ -138,14 +143,20 @@ def load_config(config_path: Path = DEFAULT_CONFIG_PATH) -> Config:
         colors.update(toml_team["colors"])
 
     # Team feeds: use toml override if present, otherwise registry defaults
-    team_feeds = toml_feeds.get("team", {}).get("urls") or list(team_info.team_feed_urls)
+    team_feeds = (
+        toml_feeds.get("team", {}).get("urls")
+        or list(team_info.team_feed_urls)
+    )
 
     # MLB-wide feeds: use toml override if present, otherwise defaults
-    mlb_feeds = toml_feeds.get("mlb", {}).get("urls") or DEFAULT_MLB_FEED_URLS
+    mlb_feeds = (
+        toml_feeds.get("mlb", {}).get("urls")
+        or DEFAULT_MLB_FEED_URLS
+    )
 
     # Subject line defaults include the emoji
-    default_subject = "{emoji} {team_name} Daily \u2014 {date}"
-    default_subject_catchup = "{emoji} {team_name} Catchup \u2014 {date}"
+    default_subject = "{emoji} {team_name} Daily — {date}"
+    default_subject_catchup = "{emoji} {team_name} Catchup — {date}"
 
     return Config(
         # Team identity

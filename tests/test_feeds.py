@@ -67,15 +67,17 @@ def test_deduplicate_removes_similar_titles():
 
 
 def test_failed_feed_logs_warning_and_returns_empty(caplog):
-    with caplog.at_level(logging.WARNING):
-        with patch(
+    with (
+        caplog.at_level(logging.WARNING),
+        patch(
             "mlb_digest.feeds._fetch_feed_content",
             side_effect=Exception("Connection refused"),
-        ):
-            articles = fetch_articles(
-                ["https://broken.example.com/feed"],
-                source_type="team",
-            )
+        ),
+    ):
+        articles = fetch_articles(
+            ["https://broken.example.com/feed"],
+            source_type="team",
+        )
 
     assert articles == []
     assert "Connection refused" in caplog.text
@@ -149,10 +151,10 @@ def test_select_articles_separates_by_source_type():
 
     result = select_articles(team_articles, mlb_articles, team_count=2, mlb_count=2)
 
-    assert len(result["team"]) == 2
-    assert len(result["mlb"]) == 2
-    assert all(a.source_type == "team" for a in result["team"])
-    assert all(a.source_type == "mlb" for a in result["mlb"])
+    assert len(result.team) == 2
+    assert len(result.mlb) == 2
+    assert all(a.source_type == "team" for a in result.team)
+    assert all(a.source_type == "mlb" for a in result.mlb)
 
 
 def test_select_articles_deduplicates_across_feeds():
@@ -184,5 +186,5 @@ def test_select_articles_deduplicates_across_feeds():
 
     result = select_articles(team_articles, mlb_articles, team_count=2, mlb_count=2)
 
-    all_titles = [a.title for a in result["team"] + result["mlb"]]
+    all_titles = [a.title for a in result.team + result.mlb]
     assert all_titles.count("Same Story") == 1

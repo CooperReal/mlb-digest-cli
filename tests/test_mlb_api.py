@@ -6,6 +6,7 @@ from mlb_digest.mlb_api import (
     GameResult,
     PlayerStats,
     RosterPlayer,
+    TopPlayers,
     UpcomingGame,
     get_active_roster,
     get_player_stats,
@@ -188,18 +189,22 @@ def test_get_player_stats_returns_stats():
 
 
 def test_get_yesterday_game_handles_api_error(caplog):
-    with caplog.at_level(logging.WARNING):
-        with patch("mlb_digest.mlb_api._fetch_schedule", side_effect=Exception("API timeout")):
-            result = get_yesterday_game(team_id=144)
+    with (
+        caplog.at_level(logging.WARNING),
+        patch("mlb_digest.mlb_api._fetch_schedule", side_effect=Exception("API timeout")),
+    ):
+        result = get_yesterday_game(team_id=144)
 
     assert result is None
     assert "API timeout" in caplog.text
 
 
 def test_get_standings_handles_api_error(caplog):
-    with caplog.at_level(logging.WARNING):
-        with patch("mlb_digest.mlb_api.statsapi.standings_data", side_effect=Exception("API down")):
-            result = get_standings(league_id=104)
+    with (
+        caplog.at_level(logging.WARNING),
+        patch("mlb_digest.mlb_api.statsapi.standings_data", side_effect=Exception("API down")),
+    ):
+        result = get_standings(league_id=104)
 
     assert result == []
 
@@ -222,25 +227,30 @@ def test_get_top_players_returns_sorted_hitters_and_pitchers():
     with patch("mlb_digest.mlb_api.get_player_stats", side_effect=mock_get_stats):
         result = get_top_players(roster)
 
-    assert result["top_hitters"][0]["name"] == "Hitter B"  # .320 > .300
-    assert result["top_hitters"][1]["name"] == "Hitter A"
-    assert len(result["top_pitchers"]) == 1
-    assert result["top_pitchers"][0]["name"] == "Pitcher A"
+    assert isinstance(result, TopPlayers)
+    assert result.top_hitters[0]["name"] == "Hitter B"  # .320 > .300
+    assert result.top_hitters[1]["name"] == "Hitter A"
+    assert len(result.top_pitchers) == 1
+    assert result.top_pitchers[0]["name"] == "Pitcher A"
 
 
 def test_get_today_game_handles_api_error(caplog):
-    with caplog.at_level(logging.WARNING):
-        with patch("mlb_digest.mlb_api._fetch_schedule", side_effect=Exception("API timeout")):
-            result = get_today_game(team_id=144, team_name="Braves")
+    with (
+        caplog.at_level(logging.WARNING),
+        patch("mlb_digest.mlb_api._fetch_schedule", side_effect=Exception("API timeout")),
+    ):
+        result = get_today_game(team_id=144, team_name="Braves")
 
     assert result is None
     assert "API timeout" in caplog.text
 
 
 def test_get_active_roster_handles_api_error(caplog):
-    with caplog.at_level(logging.WARNING):
-        with patch("mlb_digest.mlb_api._fetch_roster", side_effect=Exception("Connection refused")):
-            result = get_active_roster(team_id=144)
+    with (
+        caplog.at_level(logging.WARNING),
+        patch("mlb_digest.mlb_api._fetch_roster", side_effect=Exception("Connection refused")),
+    ):
+        result = get_active_roster(team_id=144)
 
     assert result == []
     assert "Connection refused" in caplog.text
@@ -265,4 +275,6 @@ def test_get_player_stats_returns_none_when_no_stats():
 def test_get_top_players_with_empty_roster():
     result = get_top_players([])
 
-    assert result == {"top_hitters": [], "top_pitchers": []}
+    assert isinstance(result, TopPlayers)
+    assert result.top_hitters == []
+    assert result.top_pitchers == []

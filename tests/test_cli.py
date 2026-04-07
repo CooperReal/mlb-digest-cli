@@ -1,3 +1,4 @@
+import json
 from unittest.mock import MagicMock, patch
 
 from click.testing import CliRunner
@@ -10,13 +11,17 @@ def _make_mock_config(**overrides) -> MagicMock:
     defaults = {
         "team_id": 144,
         "team_name": "Braves",
+        "full_team_name": "Atlanta Braves",
         "league_id": 104,
+        "division": "NL East",
         "team_feed_urls": [],
         "mlb_feed_urls": [],
         "anthropic_api_key": "sk-test",
         "narrator_model": "claude-sonnet-4-6",
         "narrator_temperature": 0.7,
-        "team_colors": {"primary": "#13274F", "accent": "#CE1141"},
+        "team_colors": {"primary": "#13274F", "accent": "#CE1141", "secondary": "#CE1141"},
+        "team_emoji": "\U0001fa93",
+        "narrator_hint": "Write like a Braves fan.",
         "email_recipients": ["test@example.com"],
         "email_transport": "gmail_smtp",
         "gmail_address": "test@gmail.com",
@@ -145,3 +150,26 @@ def test_cli_catchup_fetches_roster_data():
     mock_roster_call.assert_called_once()
     # Verify roster data was passed to build_prompt via generate_narrative
     assert "Roster" in result.output or "Acuna" in result.output
+
+
+def test_cli_list_teams_shows_all_divisions():
+    runner = CliRunner()
+
+    result = runner.invoke(main, ["list-teams"])
+
+    assert result.exit_code == 0
+    assert "AL East" in result.output
+    assert "NL West" in result.output
+    assert "Yankees" in result.output
+    assert "Braves" in result.output
+
+
+def test_cli_list_teams_json_output():
+    runner = CliRunner()
+
+    result = runner.invoke(main, ["list-teams", "--json-output"])
+
+    assert result.exit_code == 0
+    data = json.loads(result.output)
+    assert "AL East" in data
+    assert len(data) == 6

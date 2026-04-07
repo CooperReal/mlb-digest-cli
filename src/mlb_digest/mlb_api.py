@@ -60,6 +60,12 @@ class PlayerStats:
     stats: dict
 
 
+@dataclass
+class TopPlayers:
+    top_hitters: list[dict]
+    top_pitchers: list[dict]
+
+
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=4), reraise=True)
 def _fetch_schedule(team: int, date_str: str) -> list[dict]:
     return statsapi.schedule(team=team, date=date_str)
@@ -197,7 +203,7 @@ def get_player_stats(player_id: int, group: str = "hitting") -> PlayerStats | No
 def get_top_players(
     roster: list[RosterPlayer],
     count: int = 3,
-) -> dict[str, list[dict]]:
+) -> TopPlayers:
     hitters: list[dict] = []
     pitchers: list[dict] = []
 
@@ -222,7 +228,7 @@ def get_top_players(
     hitters.sort(key=lambda h: float(h.get("avg", "0") or "0"), reverse=True)
     pitchers.sort(key=lambda p: float(p.get("era", "99") or "99"))
 
-    return {
-        "top_hitters": hitters[:count],
-        "top_pitchers": pitchers[:count],
-    }
+    return TopPlayers(
+        top_hitters=hitters[:count],
+        top_pitchers=pitchers[:count],
+    )

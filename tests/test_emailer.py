@@ -81,14 +81,16 @@ def test_send_email_raises_on_smtp_auth_failure():
     mock_smtp_instance.__exit__ = MagicMock(return_value=False)
     mock_smtp_instance.login.side_effect = SMTPAuthenticationError(535, b"Auth failed")
 
-    with patch("mlb_digest.emailer.smtplib.SMTP_SSL", mock_smtp_class):
-        with pytest.raises(SMTPAuthenticationError):
-            send_email(
-                subject="Test",
-                html_body="<html>Hi</html>",
-                text_body="Hi",
-                sender="sender@gmail.com",
-                password="bad-password",
-                recipients=["user@example.com"],
-                transport="gmail_smtp",
-            )
+    with (
+        patch("mlb_digest.emailer.smtplib.SMTP_SSL", mock_smtp_class),
+        pytest.raises(SMTPAuthenticationError),
+    ):
+        send_email(
+            subject="Test",
+            html_body="<html>Hi</html>",
+            text_body="Hi",
+            sender="sender@gmail.com",
+            password="bad-password",
+            recipients=["user@example.com"],
+            transport="gmail_smtp",
+        )

@@ -21,6 +21,12 @@ class Article:
     source_type: str  # "team" or "mlb"
 
 
+@dataclass
+class SelectedArticles:
+    team: list[Article]
+    mlb: list[Article]
+
+
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=4), reraise=True)
 def _fetch_feed_content(url: str) -> str:
     response = httpx.get(url, timeout=10, follow_redirects=True)
@@ -87,10 +93,10 @@ def select_articles(
     mlb_articles: list[Article],
     team_count: int = 2,
     mlb_count: int = 2,
-) -> dict[str, list[Article]]:
+) -> SelectedArticles:
     all_deduped = deduplicate_articles(team_articles + mlb_articles)
 
-    selected_team = [a for a in all_deduped if a.source_type == "team"][:team_count]
-    selected_mlb = [a for a in all_deduped if a.source_type == "mlb"][:mlb_count]
+    team = [a for a in all_deduped if a.source_type == "team"][:team_count]
+    mlb = [a for a in all_deduped if a.source_type == "mlb"][:mlb_count]
 
-    return {"team": selected_team, "mlb": selected_mlb}
+    return SelectedArticles(team=team, mlb=mlb)

@@ -1,0 +1,10 @@
+# Dodgers fan config
+[team]
+name = "Dodgers"
+
+[email]
+recipients = ["your-email@gmail.com"]
+
+[narrator]
+model = "claude-sonnet-4-6"
+temperature = 0.7

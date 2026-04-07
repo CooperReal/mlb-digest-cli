@@ -7,6 +7,7 @@ from mlb_digest.mlb_api import (
     DivisionStandings,
     GameResult,
     TeamStanding,
+    TopPlayers,
 )
 from mlb_digest.narrator import NarratorError, build_prompt, build_system_prompt, generate_narrative
 
@@ -18,6 +19,29 @@ def test_build_system_prompt_includes_team_name_and_rules():
     assert "CRITICAL RULES" in prompt
     assert "NEVER invent" in prompt
     assert "Output the sections in the order" in prompt
+
+
+def test_build_system_prompt_includes_personality_and_division():
+    prompt = build_system_prompt(
+        team_name="Yankees",
+        full_team_name="New York Yankees",
+        division="AL East",
+        narrator_hint="Write like a proud Bronx fan who expects championships.",
+    )
+
+    assert "Yankees" in prompt
+    assert "AL East" in prompt
+    assert "Bronx" in prompt
+    assert "PERSONALITY" in prompt
+    assert "CRITICAL RULES" in prompt
+
+
+def test_build_system_prompt_falls_back_without_optional_args():
+    prompt = build_system_prompt("Braves")
+
+    assert "Braves" in prompt
+    assert "CRITICAL RULES" in prompt
+    assert "MLB" in prompt
 
 
 def test_build_prompt_includes_game_result():
@@ -89,10 +113,10 @@ def test_build_prompt_includes_articles():
 
 
 def test_build_prompt_includes_top_players():
-    top_players = {
-        "top_hitters": [{"name": "Acuna", "avg": ".310", "homeRuns": 15}],
-        "top_pitchers": [{"name": "Sale", "era": "2.50", "wins": 8}],
-    }
+    top_players = TopPlayers(
+        top_hitters=[{"name": "Acuna", "avg": ".310", "homeRuns": 15}],
+        top_pitchers=[{"name": "Sale", "era": "2.50", "wins": 8}],
+    )
     standings = [
         DivisionStandings(
             division_name="NL East",
@@ -227,15 +251,17 @@ def test_generate_narrative_raises_on_api_error():
     mock_client = MagicMock()
     mock_client.messages.create.side_effect = Exception("API down")
 
-    with patch("mlb_digest.narrator.anthropic.Anthropic", return_value=mock_client):
-        with pytest.raises(NarratorError, match="API down"):
-            generate_narrative(
-                prompt="test",
-                system_prompt="test",
-                api_key="sk-test",
-                model="claude-sonnet-4-6",
-                temperature=0.7,
-            )
+    with (
+        patch("mlb_digest.narrator.anthropic.Anthropic", return_value=mock_client),
+        pytest.raises(NarratorError, match="API down"),
+    ):
+        generate_narrative(
+            prompt="test",
+            system_prompt="test",
+            api_key="sk-test",
+            model="claude-sonnet-4-6",
+            temperature=0.7,
+        )
 
 
 def test_generate_narrative_raises_on_empty_content():
@@ -248,12 +274,14 @@ def test_generate_narrative_raises_on_empty_content():
     mock_client = MagicMock()
     mock_client.messages.create.return_value = mock_response
 
-    with patch("mlb_digest.narrator.anthropic.Anthropic", return_value=mock_client):
-        with pytest.raises(NarratorError, match="empty content"):
-            generate_narrative(
-                prompt="test prompt",
-                system_prompt="test system",
-                api_key="sk-test",
-                model="claude-sonnet-4-6",
-                temperature=0.7,
-            )
+    with (
+        patch("mlb_digest.narrator.anthropic.Anthropic", return_value=mock_client),
+        pytest.raises(NarratorError, match="empty content"),
+    ):
+        generate_narrative(
+            prompt="test prompt",
+            system_prompt="test system",
+            api_key="sk-test",
+            model="claude-sonnet-4-6",
+            temperature=0.7,
+        )
