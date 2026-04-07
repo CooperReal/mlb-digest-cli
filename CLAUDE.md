@@ -43,6 +43,8 @@ uv run pytest tests/ -v          # Tests
 - `.env` is gitignored
 - Pre-commit hook via `detect-secrets` scans for leaked secrets before every commit
 - `.secrets.baseline` tracks known false positives (fake test passwords) — commit this file
+- **Before every commit**, run `detect-secrets scan --baseline .secrets.baseline` and `git add .secrets.baseline` so the baseline is current. The pre-commit hook will reject commits with a stale baseline.
+- If `detect-secrets` flags a false positive in test/plan files, add `# pragma: allowlist secret` on the offending line. Never suppress real secrets.
 
 ## Pre-Push Checklist (MANDATORY)
 
