@@ -29,7 +29,9 @@ class SelectedArticles:
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=4), reraise=True)
 def _fetch_feed_content(url: str) -> str:
-    response = httpx.get(url, timeout=10, follow_redirects=True)
+    response = httpx.get(
+        url, timeout=10, follow_redirects=True, headers={"User-Agent": "mlb-digest-cli/1.0"}
+    )
     response.raise_for_status()
     return response.text
 

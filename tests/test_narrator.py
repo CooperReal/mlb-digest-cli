@@ -1,5 +1,6 @@
 from unittest.mock import MagicMock, patch
 
+import anthropic.types
 import pytest
 
 from mlb_digest.feeds import Article
@@ -226,8 +227,11 @@ def test_build_prompt_section_ordering():
 
 
 def test_generate_narrative_returns_markdown():
+    mock_block = MagicMock(spec=anthropic.types.TextBlock)
+    mock_block.text = "## Braves Daily\n\nGreat game last night!"
+
     mock_response = MagicMock()
-    mock_response.content = [MagicMock(text="## Braves Daily\n\nGreat game last night!")]
+    mock_response.content = [mock_block]
     mock_response.usage.input_tokens = 100
     mock_response.usage.output_tokens = 50
 
