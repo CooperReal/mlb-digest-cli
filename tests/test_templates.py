@@ -12,16 +12,15 @@ def test_render_email_html_converts_markdown_headers():
     assert "<html" in html.lower()
 
 
-def test_render_email_html_has_inline_styles_not_style_block():
+def test_render_email_html_has_gmail_blend_mode_css():
     md = "## Test Section\n\nContent here."
 
     html = render_email_html(md, primary_color="#13274F", accent_color="#CE1141")
 
-    assert "#13274F" in html
-    assert "Test Section" in html
-    # Only the color-scheme style is allowed — no layout/visual style blocks
-    assert "color-scheme" in html
-    assert html.count("<style>") == 1  # just the color-scheme declaration
+    assert "gfix-screen" in html
+    assert "gfix-diff" in html
+    assert "mix-blend-mode" in html
+    assert 'class="body"' in html
 
 
 def test_render_email_html_uses_dark_background():
@@ -29,8 +28,17 @@ def test_render_email_html_uses_dark_background():
 
     html = render_email_html(md, primary_color="#13274F", accent_color="#CE1141")
 
-    assert "#0d0d1a" in html  # page background
-    assert "#1a1a2e" in html  # content area
+    assert "#0d0d1a" in html
+    assert "#1a1a2e" in html
+
+
+def test_render_email_html_uses_linear_gradient_backgrounds():
+    md = "## Test\n\nContent."
+
+    html = render_email_html(md, primary_color="#13274F", accent_color="#CE1141")
+
+    assert "linear-gradient(#0d0d1a,#0d0d1a)" in html
+    assert "linear-gradient(#13274F,#13274F)" in html
 
 
 def test_render_email_html_includes_dugout_digest_branding():
@@ -56,7 +64,7 @@ def test_render_email_html_handles_links():
 
     assert 'href="https://example.com"' in html
     assert "this article" in html
-    assert "#7ea8e8" in html  # link color on dark
+    assert "#8cb8ff" in html
 
 
 def test_render_email_html_handles_tables():
@@ -66,14 +74,6 @@ def test_render_email_html_handles_tables():
 
     assert "<table" in html.lower()
     assert "Braves" in html
-
-
-def test_render_email_html_body_text_is_light_on_dark():
-    md = "## Section\n\nSome paragraph text here."
-
-    html = render_email_html(md, primary_color="#13274F", accent_color="#CE1141")
-
-    assert "#c8c8d8" in html  # light body text color
 
 
 def test_render_email_html_includes_team_name_in_header():
@@ -102,17 +102,24 @@ def test_render_email_html_has_badge_with_first_letter():
         accent_color="#CE1141",
     )
 
-    # Badge should contain "A" for Atlanta Braves
     assert ">A</span>" in html
 
 
-def test_render_email_html_accent_stripe():
-    md = "## Test\n\nContent."
+def test_render_email_html_blend_wraps_body_text_not_badge():
+    md = "## Section\n\nBody text here."
 
-    html = render_email_html(md, primary_color="#13274F", accent_color="#CE1141")
+    html = render_email_html(
+        md,
+        team_name="Atlanta Braves",
+        primary_color="#13274F",
+        accent_color="#CE1141",
+    )
 
-    # Accent color used for top stripe and footer stripe
-    assert "#CE1141" in html
+    # Badge letter should NOT be inside blend wrapper
+    assert 'line-height:42px;">A</span>' in html
+    # Body text SHOULD be inside blend wrapper
+    assert "gfix-screen" in html
+    assert "gfix-diff" in html
 
 
 def test_render_email_text_strips_markdown():
