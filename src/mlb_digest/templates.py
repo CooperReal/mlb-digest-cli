@@ -100,12 +100,12 @@ def _apply_inline_styles(html: str, accent_color: str) -> str:
     html = re.sub(
         r"<table(.*?)>",
         rf'<table\1 style="border-collapse: collapse; width: 100%; margin: 10px 0; '
-        rf'background-color: {CARD_BG}; border-radius: 8px;">',
+        rf'background: {CARD_BG}; border-radius: 8px;">',
         html,
     )
     html = re.sub(
         r"<th(.*?)>",
-        rf'<th\1 style="background-color: {DARK_SURFACE}; color: {MUTED_TEXT}; '
+        rf'<th\1 style="background: {DARK_SURFACE}; color: {MUTED_TEXT}; '
         rf"padding: 12px 14px; text-align: left; font-family: {SANS}; "
         r'font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">',
         html,
@@ -153,32 +153,38 @@ def render_email_html(
         "<head>"
         '<meta charset="utf-8">'
         '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
+        # Tell Gmail/Apple Mail to leave our dark colors alone
+        '<meta name="color-scheme" content="light dark">'
+        '<meta name="supported-color-schemes" content="light dark">'
+        "<style>:root{color-scheme:light dark;}</style>"
         "</head>\n"
-        f'<body style="margin:0; padding:0; background-color:{PAGE_BG}; '
+        # Gmail dark mode prevention: use `background` shorthand instead of
+        # `background-color` so Gmail's inversion algorithm skips these elements.
+        f'<body style="margin:0; padding:0; background:{PAGE_BG}; '
         f"font-family:{SERIF}; "
         '-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">\n'
         # Outer wrapper
         f'<table role="presentation" cellpadding="0" cellspacing="0" border="0" '
-        f'width="100%" style="background-color:{PAGE_BG};">\n'
+        f'width="100%" style="background:{PAGE_BG};">\n'
         "<tr>\n"
         f'<td align="center" style="padding:20px 10px;">\n'
         # Main container
         f'<table role="presentation" cellpadding="0" cellspacing="0" border="0" '
         f'width="600" style="max-width:600px; width:100%; '
-        f'background-color:{primary_color};">\n'
+        f'background:{primary_color};">\n'
         # Header: accent stripe + branding
         "<tr>\n"
-        f'<td style="background-color:{accent_color}; height:4px; '
+        f'<td style="background:{accent_color}; height:4px; '
         f'font-size:1px; line-height:1px;">&nbsp;</td>\n'
         "</tr>\n"
         "<tr>\n"
-        f'<td style="background-color:{primary_color}; padding:24px 30px 20px 30px;">\n'
+        f'<td style="background:{primary_color}; padding:24px 30px 20px 30px;">\n'
         f'<table role="presentation" cellpadding="0" cellspacing="0" border="0" '
         f'width="100%"><tr>\n'
         f'<td style="vertical-align:middle;">\n'
         # Badge + name
         f'<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>\n'
-        f'<td style="background-color:{accent_color}; width:42px; height:42px; '
+        f'<td style="background:{accent_color}; width:42px; height:42px; '
         f'text-align:center; vertical-align:middle; border-radius:6px;">'
         f'<span style="font-family:{SANS}; font-size:24px; font-weight:bold; '
         f'color:#ffffff; line-height:42px;">{badge_letter}</span></td>\n'
@@ -195,17 +201,17 @@ def render_email_html(
         "</tr>\n"
         # Content area: dark background
         "<tr>\n"
-        f'<td style="background-color:{CONTENT_BG}; padding:8px 30px 30px 30px;">\n'
+        f'<td style="background:{CONTENT_BG}; padding:8px 30px 30px 30px;">\n'
         f"{body_html}\n"
         "</td>\n"
         "</tr>\n"
         # Footer
         "<tr>\n"
-        f'<td style="background-color:{accent_color}; height:2px; '
+        f'<td style="background:{accent_color}; height:2px; '
         f'font-size:1px; line-height:1px;">&nbsp;</td>\n'
         "</tr>\n"
         "<tr>\n"
-        f'<td style="background-color:{primary_color}; padding:24px 30px; '
+        f'<td style="background:{primary_color}; padding:24px 30px; '
         f'text-align:center;">\n'
         f'<span style="font-family:{SANS}; font-size:14px; font-weight:bold; '
         f'color:#ffffff; letter-spacing:1px;">THE DUGOUT DIGEST</span><br>\n'
