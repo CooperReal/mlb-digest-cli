@@ -19,7 +19,9 @@ def test_render_email_html_has_inline_styles_not_style_block():
 
     assert "#13274F" in html
     assert "Test Section" in html
-    assert "<style>" not in html
+    # Only the color-scheme style is allowed — no layout/visual style blocks
+    assert "color-scheme" in html
+    assert html.count("<style>") == 1  # just the color-scheme declaration
 
 
 def test_render_email_html_uses_dark_background():
