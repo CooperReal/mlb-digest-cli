@@ -108,7 +108,7 @@ if ! command -v uv >/dev/null 2>&1; then
   exit 1
 fi
 
-uv sync
+uv sync --all-extras
 
 if [ ! -f .env ]; then
   cp .env.example .env
