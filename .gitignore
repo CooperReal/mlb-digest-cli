@@ -9,3 +9,5 @@ build/
 .ruff_cache/
 .coverage
 mockups/
+graphify-out/*
+!graphify-out/.last-sha
