@@ -25,8 +25,8 @@ defenses from ADR 0002) without sending real emails until the final check.
 
 5. Run: `uv run mlb-digest test-email` — sends the sample digest through the
    real template.
-6. Open Gmail web in Chrome, find the "MLB Digest — Test Email" message,
-   screenshot it, share in chat.
+6. Open Gmail web in Chrome, find the "MLB Digest — Test Email (sample data)"
+   message, screenshot it, share in chat.
 7. Ask the user to glance at Gmail iOS dark mode when convenient.
 
 ## Caveat

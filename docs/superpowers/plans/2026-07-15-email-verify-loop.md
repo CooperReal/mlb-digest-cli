@@ -38,6 +38,14 @@
 
 ## Part A — PR 1: the verification loop
 
+> **STATUS: Part A landed as PR 1 — do not re-execute these tasks.** Deviations from
+> the original steps, applied during review: the `preview/` gitignore line was pulled
+> forward from Task 6 into its own commit; the preview.py module docstring was scoped
+> to current behavior and grows with each task; the heading assertions in
+> test_preview.py are line-anchored (`"\n## "`); the preview CLI test hardens
+> `validate_secrets` with a side_effect guard. Task 0 (Gmail baseline screenshot) was
+> deferred — Chrome extension unavailable; runs before Part B.
+
 ### Task 0: Baseline — screenshot the current email in Gmail web
 
 No code. Establishes ground truth before any changes.
@@ -56,7 +64,7 @@ No code. Establishes ground truth before any changes.
 - Modify: `pyproject.toml` (after line 33)
 - Modify: `tests/test_architecture.py:29-38`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `tests/test_preview.py`:
 
@@ -76,12 +84,12 @@ def test_load_sample_digest_contains_all_template_elements():
     assert "\n---\n" in sample
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `uv run pytest tests/test_preview.py -v`
 Expected: FAIL — `ModuleNotFoundError: No module named 'mlb_digest.preview'`
 
-- [ ] **Step 3: Create the sample markdown**
+- [x] **Step 3: Create the sample markdown**
 
 Create `src/mlb_digest/sample_digest.md`:
 
@@ -117,7 +125,7 @@ Acuna finished 3-for-4 with a homer, a double, and two runs scored.
 Tonight, 7:20 PM ET at Truist Park. Braves send their ace to the mound against the Phillies' lefty.
 ```
 
-- [ ] **Step 4: Create the module**
+- [x] **Step 4: Create the module**
 
 Create `src/mlb_digest/preview.py`:
 
@@ -147,7 +155,7 @@ def load_sample_digest() -> str:
     return sample_file.read_text(encoding="utf-8")
 ```
 
-- [ ] **Step 5: Ship the markdown as package data**
+- [x] **Step 5: Ship the markdown as package data**
 
 In `pyproject.toml`, after the `[tool.setuptools.packages.find]` block (line 32-33), add:
 
@@ -156,7 +164,7 @@ In `pyproject.toml`, after the `[tool.setuptools.packages.find]` block (line 32-
 mlb_digest = ["*.md"]
 ```
 
-- [ ] **Step 6: Register the module in the architecture layers**
+- [x] **Step 6: Register the module in the architecture layers**
 
 In `tests/test_architecture.py`, change the `LAYER` dict (line 29) to include `preview` at layer 3 (it imports `templates`, layer 3, and `config`, layer 0):
 
@@ -174,12 +182,12 @@ LAYER: dict[str, int] = {
 }
 ```
 
-- [ ] **Step 7: Run tests to verify they pass**
+- [x] **Step 7: Run tests to verify they pass**
 
 Run: `uv run pytest tests/test_preview.py tests/test_architecture.py -v`
 Expected: PASS (architecture tests now include `preview` and find `tests/test_preview.py`)
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 bash check.sh && git add -A && git commit -m "feat: add preview module with sample digest data"
@@ -191,7 +199,7 @@ bash check.sh && git add -A && git commit -m "feat: add preview module with samp
 - Modify: `src/mlb_digest/preview.py`
 - Modify: `tests/test_preview.py`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Update the imports at the top of `tests/test_preview.py` to:
 
@@ -230,12 +238,12 @@ def test_gmail_dark_harness_rejects_html_without_body_class():
         wrap_in_gmail_dark_harness("<html><body>plain</body></html>")
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `uv run pytest tests/test_preview.py -v`
 Expected: FAIL — `ImportError: cannot import name 'wrap_in_gmail_dark_harness'`
 
-- [ ] **Step 3: Implement the harness**
+- [x] **Step 3: Implement the harness**
 
 Add to `src/mlb_digest/preview.py`:
 
@@ -265,12 +273,12 @@ def wrap_in_gmail_dark_harness(email_html: str) -> str:
     )
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `uv run pytest tests/test_preview.py -v`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 bash check.sh && git add -A && git commit -m "feat: add Gmail dark-mode DOM harness for previews"
@@ -282,7 +290,7 @@ bash check.sh && git add -A && git commit -m "feat: add Gmail dark-mode DOM harn
 - Modify: `src/mlb_digest/preview.py`
 - Modify: `tests/test_preview.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Add to `tests/test_preview.py` (add `from unittest.mock import MagicMock` and
 `from mlb_digest.preview import write_preview_files` to the imports):
@@ -303,12 +311,12 @@ def test_write_preview_files_creates_plain_and_dark_files(tmp_path):
     assert "<u></u>" in dark_file.read_text(encoding="utf-8")
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `uv run pytest tests/test_preview.py -v`
 Expected: FAIL — `ImportError: cannot import name 'write_preview_files'`
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Add to `src/mlb_digest/preview.py`:
 
@@ -333,12 +341,12 @@ def write_preview_files(config: Config, output_dir: Path) -> list[Path]:
     return [plain_path, dark_path]
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `uv run pytest tests/test_preview.py -v`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 bash check.sh && git add -A && git commit -m "feat: write plain and gmail-dark preview files"
@@ -350,7 +358,7 @@ bash check.sh && git add -A && git commit -m "feat: write plain and gmail-dark p
 - Modify: `src/mlb_digest/cli.py`
 - Modify: `tests/test_cli.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Add to `tests/test_cli.py`:
 
@@ -367,12 +375,12 @@ def test_cli_preview_writes_both_html_files(tmp_path):
     assert "preview.html" in result.output
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `uv run pytest tests/test_cli.py::test_cli_preview_writes_both_html_files -v`
 Expected: FAIL — `Error: No such command 'preview'` (exit_code 2)
 
-- [ ] **Step 3: Implement the command**
+- [x] **Step 3: Implement the command**
 
 In `src/mlb_digest/cli.py`: add `from pathlib import Path` to the stdlib imports
 and `from mlb_digest.preview import load_sample_digest, write_preview_files` to
@@ -398,12 +406,12 @@ def preview(out_dir: Path) -> None:
 
 Note: no `validate_secrets()` — preview needs no secrets and must work offline.
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `uv run pytest tests/test_cli.py -v`
 Expected: PASS (all, including existing tests)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 bash check.sh && git add -A && git commit -m "feat: add preview CLI subcommand"
@@ -415,7 +423,7 @@ bash check.sh && git add -A && git commit -m "feat: add preview CLI subcommand"
 - Modify: `src/mlb_digest/cli.py:178-205`
 - Modify: `tests/test_cli.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Add to `tests/test_cli.py`:
 
@@ -435,12 +443,12 @@ def test_cli_test_email_sends_real_template():
     assert "linear-gradient" in html_body
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `uv run pytest tests/test_cli.py::test_cli_test_email_sends_real_template -v`
 Expected: FAIL — `AssertionError` (current body is `<h1>Hello from MLB Digest!</h1>`)
 
-- [ ] **Step 3: Rewrite the command body**
+- [x] **Step 3: Rewrite the command body**
 
 Replace the `test_email` function body in `src/mlb_digest/cli.py` (lines 179-205) with:
 
@@ -478,12 +486,12 @@ def test_email() -> None:
         raise SystemExit(1) from e
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `uv run pytest tests/test_cli.py -v`
 Expected: PASS (including the pre-existing `test_cli_test_email_subcommand`)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 bash check.sh && git add -A && git commit -m "feat: test-email sends the real template from sample data"
@@ -495,7 +503,7 @@ bash check.sh && git add -A && git commit -m "feat: test-email sends the real te
 - Modify: `.gitignore`
 - Create: `.claude/skills/email-check/SKILL.md`
 
-- [ ] **Step 1: Ignore preview output**
+- [x] **Step 1: Ignore preview output**
 
 Add to `.gitignore`:
 
@@ -503,7 +511,7 @@ Add to `.gitignore`:
 preview/
 ```
 
-- [ ] **Step 2: Write the skill**
+- [x] **Step 2: Write the skill**
 
 Create `.claude/skills/email-check/SKILL.md`:
 
@@ -546,7 +554,7 @@ stays legible. It does not replicate Gmail iOS's exact color transformation —
 the final check plus the iOS glance covers that gap.
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 bash check.sh && git add -A && git commit -m "chore: add email-check skill and ignore preview output"
@@ -556,9 +564,9 @@ bash check.sh && git add -A && git commit -m "chore: add email-check skill and i
 
 Run the loop end-to-end on the unchanged template — proves the tooling and re-baselines.
 
-- [ ] **Step 1:** Run `uv run mlb-digest preview`. Expected output: two file paths.
-- [ ] **Step 2:** Open `file:///Users/cooperreal/mlb-digest-cli/preview/preview.html` and `file:///Users/cooperreal/mlb-digest-cli/preview/preview-gmail-dark.html` in Chrome, screenshot both, share in chat.
-- [ ] **Step 3:** Confirm: dark navy page, white legible text, red accent stripe/labels, readable standings table in both variants. If the harness itself is buggy (not the template), fix it here with a test before proceeding.
+- [x] **Step 1:** Run `uv run mlb-digest preview`. Expected output: two file paths.
+- [x] **Step 2:** Open `file:///Users/cooperreal/mlb-digest-cli/preview/preview.html` and `file:///Users/cooperreal/mlb-digest-cli/preview/preview-gmail-dark.html` in Chrome, screenshot both, share in chat.
+- [x] **Step 3:** Confirm: dark navy page, white legible text, red accent stripe/labels, readable standings table in both variants. If the harness itself is buggy (not the template), fix it here with a test before proceeding.
 
 ### Task 8: PR 1
 
@@ -648,7 +656,7 @@ bash check.sh && git add -A && git commit -m "refactor: remove dead _gfix helper
 
 **Files:**
 - Modify: `src/mlb_digest/templates.py:152-159`
-- Modify: `src/mlb_digest/cli.py:148-155`
+- Modify: `src/mlb_digest/cli.py` (the `render_email_html(...)` call in the main flow)
 
 - [ ] **Step 1:** In `render_email_html`, delete the line `secondary_color: str = "#666666",` from the signature. The parameter is never used in the function body.
 - [ ] **Step 2:** In `cli.py`, delete the line `secondary_color=config.team_colors.get("secondary", "#666666"),` from the `render_email_html(...)` call.
@@ -663,7 +671,7 @@ bash check.sh && git add -A && git commit -m "refactor: remove unused secondary_
 
 **Files:**
 - Modify: `tests/test_emailer.py`
-- Modify: `src/mlb_digest/emailer.py:31`
+- Modify: `src/mlb_digest/emailer.py` (the `smtplib.SMTP_SSL(...)` call in `_send_gmail_smtp`)
 
 - [ ] **Step 1: Write the failing test** — add to `tests/test_emailer.py` (match its existing patch style; it already patches `smtplib.SMTP_SSL` — check the exact patch target used by `test_send_email_calls_smtp` and reuse it):
 
@@ -730,7 +738,7 @@ For each confirmed finding from Task 14, apply this loop (one commit per finding
 These two are pre-confirmed violations of the new rule; convert regardless of Task 14 output. Trivial one-line transforms elsewhere (e.g. `[asdict(p) for p in roster]`, `[a.title for a in team_articles]`) stay — they satisfy the rule.
 
 **Files:**
-- Modify: `src/mlb_digest/cli.py:217-229` (`list-teams --json-output` — nested, multi-line)
+- Modify: `src/mlb_digest/cli.py` (the `--json-output` branch of `list_teams_cmd` — nested, multi-line)
 - Modify: `src/mlb_digest/config.py:91-94` (`_parse_recipients` — has a conditional)
 
 - [ ] **Step 1:** Rewrite the `list-teams` JSON branch:

@@ -1,5 +1,5 @@
 """
-Sample data for email previews.
+Render the digest email from sample data into local preview files.
 
 Loads the canned sample digest shipped with the package, wraps the rendered
 HTML in a Gmail-like DOM for dark-mode previews, and writes both preview
