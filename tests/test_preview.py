@@ -1,6 +1,12 @@
+from unittest.mock import MagicMock
+
 import pytest
 
-from mlb_digest.preview import load_sample_digest, wrap_in_gmail_dark_harness
+from mlb_digest.preview import (
+    load_sample_digest,
+    wrap_in_gmail_dark_harness,
+    write_preview_files,
+)
 from mlb_digest.templates import render_email_html
 
 
@@ -39,3 +45,18 @@ def test_gmail_dark_harness_keeps_blend_mode_css():
 def test_gmail_dark_harness_rejects_html_without_body_class():
     with pytest.raises(ValueError, match="no <body"):
         wrap_in_gmail_dark_harness("<html><body>plain</body></html>")
+
+
+def test_write_preview_files_creates_plain_and_dark_files(tmp_path):
+    config = MagicMock()
+    config.full_team_name = "Atlanta Braves"
+    config.team_colors = {"primary": "#13274F", "accent": "#CE1141"}
+    config.team_emoji = "⚾"
+
+    written = write_preview_files(config, tmp_path)
+
+    plain_file = tmp_path / "preview.html"
+    dark_file = tmp_path / "preview-gmail-dark.html"
+    assert written == [plain_file, dark_file]
+    assert "Atlanta Braves" in plain_file.read_text(encoding="utf-8")
+    assert "<u></u>" in dark_file.read_text(encoding="utf-8")
