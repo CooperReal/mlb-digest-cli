@@ -1,10 +1,8 @@
 """
-Preview rendering for the email template.
+Sample data for email previews.
 
-Writes the rendered email to local HTML files so it can be inspected in a
-browser without sending anything. The gmail-dark variant reproduces the DOM
-Gmail builds around an email (a <u> element followed by a .body-classed
-wrapper) so the ADR-0002 blend-mode defenses activate in a normal browser.
+Loads the canned sample digest shipped with the package, used for
+email previews and test sends.
 """
 
 from importlib import resources
