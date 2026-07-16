@@ -33,6 +33,7 @@ LAYER: dict[str, int] = {
     "feeds": 1,
     "narrator": 2,
     "templates": 3,
+    "preview": 3,
     "emailer": 4,
     "cli": 5,
 }
