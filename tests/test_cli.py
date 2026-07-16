@@ -177,8 +177,12 @@ def test_cli_list_teams_json_output():
 
 def test_cli_preview_writes_both_html_files(tmp_path):
     runner = CliRunner()
+    mock_config = _make_mock_config()
+    mock_config.validate_secrets.side_effect = AssertionError(
+        "preview must not require secrets"
+    )
 
-    with patch("mlb_digest.cli.load_config", return_value=_make_mock_config()):
+    with patch("mlb_digest.cli.load_config", return_value=mock_config):
         result = runner.invoke(main, ["preview", "--out", str(tmp_path)])
 
     assert result.exit_code == 0
