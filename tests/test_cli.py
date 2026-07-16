@@ -59,6 +59,21 @@ def test_cli_test_email_subcommand():
     mock_send.assert_called_once()
 
 
+def test_cli_test_email_sends_real_template():
+    runner = CliRunner()
+
+    with (
+        patch("mlb_digest.cli.send_email") as mock_send,
+        patch("mlb_digest.cli.load_config", return_value=_make_mock_config()),
+    ):
+        result = runner.invoke(main, ["test-email"])
+
+    assert result.exit_code == 0
+    html_body = mock_send.call_args[1]["html_body"]
+    assert "DUGOUT DIGEST" in html_body
+    assert "linear-gradient" in html_body
+
+
 def test_cli_dry_run_does_not_call_narrator_or_emailer():
     runner = CliRunner()
 
@@ -173,3 +188,17 @@ def test_cli_list_teams_json_output():
     data = json.loads(result.output)
     assert "AL East" in data
     assert len(data) == 6
+
+
+def test_cli_preview_writes_both_html_files(tmp_path):
+    runner = CliRunner()
+    mock_config = _make_mock_config()
+    mock_config.validate_secrets.side_effect = AssertionError("preview must not require secrets")
+
+    with patch("mlb_digest.cli.load_config", return_value=mock_config):
+        result = runner.invoke(main, ["preview", "--out", str(tmp_path)])
+
+    assert result.exit_code == 0
+    assert (tmp_path / "preview.html").exists()
+    assert (tmp_path / "preview-gmail-dark.html").exists()
+    assert "preview.html" in result.output
