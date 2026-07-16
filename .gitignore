@@ -11,3 +11,4 @@ build/
 mockups/
 graphify-out/*
 !graphify-out/.last-sha
+preview/
