@@ -173,3 +173,15 @@ def test_cli_list_teams_json_output():
     data = json.loads(result.output)
     assert "AL East" in data
     assert len(data) == 6
+
+
+def test_cli_preview_writes_both_html_files(tmp_path):
+    runner = CliRunner()
+
+    with patch("mlb_digest.cli.load_config", return_value=_make_mock_config()):
+        result = runner.invoke(main, ["preview", "--out", str(tmp_path)])
+
+    assert result.exit_code == 0
+    assert (tmp_path / "preview.html").exists()
+    assert (tmp_path / "preview-gmail-dark.html").exists()
+    assert "preview.html" in result.output

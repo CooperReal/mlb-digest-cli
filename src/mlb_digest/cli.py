@@ -2,6 +2,7 @@ import json
 import logging
 import sys
 from dataclasses import asdict
+from pathlib import Path
 
 import click
 
@@ -21,6 +22,7 @@ from mlb_digest.narrator import (
     build_system_prompt,
     generate_narrative,
 )
+from mlb_digest.preview import write_preview_files
 from mlb_digest.templates import render_email_html, render_email_text
 
 logging.basicConfig(
@@ -203,6 +205,23 @@ def test_email() -> None:
         logger.exception("Test email failed")
         click.echo(f"Test email failed: {e}", err=True)
         raise SystemExit(1) from e
+
+
+@main.command()
+@click.option(
+    "--out",
+    "out_dir",
+    type=click.Path(file_okay=False, path_type=Path),
+    default=Path("preview"),
+    help="Directory for the preview HTML files.",
+)
+def preview(out_dir: Path) -> None:
+    """Render the email template from sample data into local HTML files."""
+    config = load_config()
+
+    written = write_preview_files(config, out_dir)
+    for path in written:
+        click.echo(str(path))
 
 
 @main.command("list-teams")
