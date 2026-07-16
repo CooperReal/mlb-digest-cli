@@ -22,7 +22,7 @@ from mlb_digest.narrator import (
     build_system_prompt,
     generate_narrative,
 )
-from mlb_digest.preview import write_preview_files
+from mlb_digest.preview import load_sample_digest, write_preview_files
 from mlb_digest.templates import render_email_html, render_email_text
 
 logging.basicConfig(
@@ -179,22 +179,25 @@ def main(
 
 @main.command()
 def test_email() -> None:
-    """Send a test email to verify Gmail setup."""
+    """Send the sample digest through the real template to verify Gmail setup."""
     config = load_config()
     config.validate_secrets()
 
+    sample_md = load_sample_digest()
+    html_body = render_email_html(
+        sample_md,
+        team_name=config.full_team_name,
+        primary_color=config.team_colors.get("primary", "#333333"),
+        accent_color=config.team_colors.get("accent", "#cc0000"),
+        emoji=config.team_emoji,
+    )
+    text_body = render_email_text(sample_md, team_name=config.full_team_name)
+
     try:
         send_email(
-            subject="MLB Digest - Test Email",
-            html_body=(
-                "<html><body>"
-                "<h1>Hello from MLB Digest!</h1>"
-                f"<p>Your email setup works. Configured for: {config.full_team_name}</p>"
-                "</body></html>"
-            ),
-            text_body=(
-                f"Hello from MLB Digest! Your email setup works. Team: {config.full_team_name}"
-            ),
+            subject="MLB Digest — Test Email (sample data)",
+            html_body=html_body,
+            text_body=text_body,
             sender=config.gmail_address,
             password=config.gmail_app_password,
             recipients=config.email_recipients,

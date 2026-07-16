@@ -59,6 +59,21 @@ def test_cli_test_email_subcommand():
     mock_send.assert_called_once()
 
 
+def test_cli_test_email_sends_real_template():
+    runner = CliRunner()
+
+    with (
+        patch("mlb_digest.cli.send_email") as mock_send,
+        patch("mlb_digest.cli.load_config", return_value=_make_mock_config()),
+    ):
+        result = runner.invoke(main, ["test-email"])
+
+    assert result.exit_code == 0
+    html_body = mock_send.call_args[1]["html_body"]
+    assert "DUGOUT DIGEST" in html_body
+    assert "linear-gradient" in html_body
+
+
 def test_cli_dry_run_does_not_call_narrator_or_emailer():
     runner = CliRunner()
 
